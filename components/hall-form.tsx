@@ -1,42 +1,45 @@
 "use client"
 
+import { useSearchParams } from "next/navigation"
+import { HallSchema } from "@/schemas/hall"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Hall } from "@prisma/client"
 import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { z } from "zod"
-import {Hall} from "@prisma/client"
-import {  Form,
+
+import { trpc } from "@/app/_trpc/client"
+
+import { Button } from "./ui/button"
+import {
+  Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,} from "./ui/form"
+  FormMessage,
+} from "./ui/form"
 import { Input } from "./ui/input"
 
-import { Button } from "./ui/button"
-import { HallSchema } from "@/schemas/hall"
-import { useSearchParams } from "next/navigation"
-import { trpc } from "@/app/_trpc/client"
-import toast from "react-hot-toast"
-export function CollegeDetailsForm({hall}:{hall?:Hall}) {
+export function CollegeDetailsForm({ hall }: { hall?: Hall }) {
   const searchParams = useSearchParams()
-  const create= trpc.hall.create.useMutation({
-    onSuccess:(data)=> {
+  const create = trpc.hall.create.useMutation({
+    onSuccess: (data) => {
       toast.success("Hall created")
     },
-    onError:(error)=> {
+    onError: (error) => {
       toast.error(error.message)
-    }
+    },
   })
   const form = useForm<z.infer<typeof HallSchema>>({
     resolver: zodResolver(HallSchema),
     defaultValues: {
       hallno: "",
-      rows:6,
-      cols:5,
-      departmentId:searchParams.get("departmentId") || "",
+      rows: 6,
+      cols: 5,
+      departmentId: searchParams.get("departmentId") || "",
     },
   })
-
 
   const onSubmit = async (data: z.infer<typeof HallSchema>) => {
     await create.mutateAsync(data)

@@ -21,6 +21,6 @@ export const hallRouter = router({
         })
       })
     )
-    return {...hall, seats}
+    return { ...hall, seats }
   }),
 })
