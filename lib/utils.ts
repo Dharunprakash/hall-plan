@@ -1,7 +1,7 @@
 import { inputExcelFormSchema, studentSchema } from "@/schemas/student"
 import { clsx, type ClassValue } from "clsx"
 import jsPDF from "jspdf"
-import { Student } from "prisma/prisma-client"
+import { Seat, Student } from "prisma/prisma-client"
 import { UseFormReturn } from "react-hook-form"
 import { twMerge } from "tailwind-merge"
 import * as XLSX from "xlsx"

@@ -89,12 +89,13 @@ model Hall {
   rows        Int
   cols        Int
   seats       Seat[]
-  hallno      String               @unique
+  hallno      Int              
   type        HallArrangementType? @default(NORMAL)
   hallHistory HallHistory[]
 
   departmentId String     @db.ObjectId
   department   Department @relation(fields: [departmentId], references: [id])
+  @@index([hallno, departmentId], name: "hall_index")
 }
 
 model Seat {

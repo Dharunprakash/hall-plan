@@ -1,5 +1,6 @@
-import { Hall, Seat } from "@prisma/client"
+import { Department, Hall, Seat } from "@prisma/client"
 
-export type HallWithSeats = Hall & {
+export type HallWithSeatsAndDept = Hall & {
   seats: Seat[]
+  department: Department
 }
