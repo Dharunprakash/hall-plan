@@ -8,6 +8,13 @@ export const departmentRouter = router({
   getAll: publicProcedure.query(async ({}) => {
     return await db.department.findMany()
   }),
+  getAllWithHalls: publicProcedure.query(async ({}) => {
+    return await db.department.findMany({
+      include: {
+        halls: true,
+      },
+    })
+  }),
   create: publicProcedure
     .input(
       z.object({
