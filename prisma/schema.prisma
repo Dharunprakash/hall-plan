@@ -89,8 +89,8 @@ model Hall {
   rows        Int
   cols        Int
   seats       Seat[]
-  hallno      String              @unique
-  type        HallArrangementType @default(NORMAL)
+  hallno      String               @unique
+  type        HallArrangementType? @default(NORMAL)
   hallHistory HallHistory[]
 
   departmentId String     @db.ObjectId

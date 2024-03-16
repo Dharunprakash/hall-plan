@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
+import {College} from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-export function CollegeDetailsForm() {
+import { UploadButton,UploadDropzone } from "@/lib/uploadthing"
+
+export function CollegeDetailsForm({college}:{college?:College}) {
   const collegeSchema = z.object({
     name: z.string().min(2, {
       message: "department name is required",
@@ -35,7 +37,6 @@ export function CollegeDetailsForm() {
       description: "",
     },
   })
-
   const onSubmit = (data: z.infer<typeof collegeSchema>) => {
     console.log(data)
   }
