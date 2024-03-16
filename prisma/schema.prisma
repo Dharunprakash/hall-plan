@@ -54,7 +54,7 @@ model Department {
   name     String
   code     String
   students Student[]
-  hall     Hall[]
+  halls    Hall[]
 
   @@index([name], name: "department_index")
   @@index([code], name: "department_index_code")
@@ -98,15 +98,14 @@ model Hall {
 }
 
 model Seat {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
   row       Int
   col       Int
-  status    String
-  student   Student? @relation(fields: [studentId], references: [id])
-  studentId String?  @db.ObjectId
-  hallId    String   @db.ObjectId
-  hall      Hall     @relation(fields: [hallId], references: [id])
-
+  isBlocked Boolean      @default(false)
+  student   Student?     @relation(fields: [studentId], references: [id])
+  studentId String?      @db.ObjectId
+  hallId    String       @db.ObjectId
+  hall      Hall         @relation(fields: [hallId], references: [id])
   historyId String?      @db.ObjectId
   history   HallHistory? @relation(fields: [historyId], references: [id])
 }
