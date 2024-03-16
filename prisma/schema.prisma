@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// A simple Chat schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum HallArrangementType {
+  CHECKERBOARD
+  ALTERNATE
+  NORMAL
+}
+
+// The User model is used by the NextAuth.js authentication library
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+}
+
+model College {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  logo        String?
+  coverImage  String?
+  name        String?
+  district    String?
+  description String?
+
+  code  String? @unique @default("xxxx")
+  aishe String? @unique @default("C-xxxxx")
+
+  state   String?
+  pincode String?
+  address String?
+  phone   String?
+  email   String?
+}
+
+model Department {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  code     String
+  students Student[]
+  hall     Hall[]
+
+  @@index([name], name: "department_index")
+  @@index([code], name: "department_index_code")
+}
+
+model Student {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  regno    String  @unique
+  rollno   Int
+  name     String
+  year     Int
+  section  String
+  semester Int
+  vertical String? @default("NONE")
+  batch    String? @default("2021-2025")
+
+  hallId String?      @db.ObjectId
+  hall   HallHistory? @relation(fields: [hallId], references: [id])
+
+  departmentId String     @db.ObjectId
+  department   Department @relation(fields: [departmentId], references: [id])
+  Seat         Seat[]
+
+  @@index([rollno, departmentId, year, section], name: "student_index")
+  @@index([rollno, departmentId, section, batch], name: "student_index_batch")
+}
+
+model Hall {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  capacity Int
+
+  rows        Int
+  cols        Int
+  seats       Seat[]
+  hallno      String              @unique
+  type        HallArrangementType @default(NORMAL)
+  hallHistory HallHistory[]
+
+  departmentId String     @db.ObjectId
+  department   Department @relation(fields: [departmentId], references: [id])
+}
+
+model Seat {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  row       Int
+  col       Int
+  status    String
+  student   Student? @relation(fields: [studentId], references: [id])
+  studentId String?  @db.ObjectId
+  hallId    String   @db.ObjectId
+  hall      Hall     @relation(fields: [hallId], references: [id])
+
+  historyId String?      @db.ObjectId
+  history   HallHistory? @relation(fields: [historyId], references: [id])
+}
+
+model History {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  hallHistory HallHistory[]
+}
+
+model HallHistory {
+  id       String              @id @default(auto()) @map("_id") @db.ObjectId
+  hallId   String              @db.ObjectId
+  hall     Hall                @relation(fields: [hallId], references: [id])
+  rows     Int
+  cols     Int
+  seats    Seat[]
+  type     HallArrangementType
+  status   String
+  modified DateTime            @default(now())
+  students Student[]
+
+  historyId String  @db.ObjectId
+  history   History @relation(fields: [historyId], references: [id])
+}
+
+// The Account model is used by the NextAuth.js authentication library
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// The PasswordResetToken and VerificationToken models are used by the NextAuth.js authentication library
+model PasswordResetToken {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model VerificationToken {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
