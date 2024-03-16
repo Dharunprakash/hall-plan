@@ -89,8 +89,8 @@ model Hall {
   rows        Int
   cols        Int
   seats       Seat[]
-  hallno      String              @unique
-  type        HallArrangementType @default(NORMAL)
+  hallno      String               @unique
+  type        HallArrangementType? @default(NORMAL)
   hallHistory HallHistory[]
 
   departmentId String     @db.ObjectId
@@ -101,7 +101,7 @@ model Seat {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   row       Int
   col       Int
-  status    String
+  isBlocked Boolean @default(false)
   student   Student? @relation(fields: [studentId], references: [id])
   studentId String?  @db.ObjectId
   hallId    String   @db.ObjectId

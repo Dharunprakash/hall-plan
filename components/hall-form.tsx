@@ -13,20 +13,19 @@ import {  Form,
 import { Input } from "./ui/input"
 
 import { Button } from "./ui/button"
+import { HallSchema } from "@/schemas/hall"
+import { useSearchParams } from "next/navigation"
+import { trpc } from "@/app/_trpc/client"
+import toast from "react-hot-toast"
 export function CollegeDetailsForm({hall}:{hall?:Hall}) {
-  const HallSchema = z.object({
-    hallno: z.string().min(1, {
-      message: "department name is required",
-    }),
-    rows:z.number().min(1, {
-      message:"row is required",
-    }),
-    cols:z.number().min(1, {
-      message:"col is required",
-    }),
-    capacity:z.number().min(1, {
-      message:"capacity is required",
-    }),
+  const searchParams = useSearchParams()
+  const create= trpc.hall.create.useMutation({
+    onSuccess:(data)=> {
+      toast.success("Hall created")
+    },
+    onError:(error)=> {
+      toast.error(error.message)
+    }
   })
   const form = useForm<z.infer<typeof HallSchema>>({
     resolver: zodResolver(HallSchema),
@@ -34,12 +33,13 @@ export function CollegeDetailsForm({hall}:{hall?:Hall}) {
       hallno: "",
       rows:6,
       cols:5,
+      departmentId:searchParams.get("departmentId") || "",
     },
   })
 
 
-  const onSubmit = (data: z.infer<typeof HallSchema>) => {
-    console.log(data)
+  const onSubmit = async (data: z.infer<typeof HallSchema>) => {
+    await create.mutateAsync(data)
   }
   return (
     <Form {...form}>
