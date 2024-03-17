@@ -39,3 +39,10 @@ export const getCapacity = <T extends BasicSeat[]>(seatMatrix: T[]): number => {
     return acc + (seat.isBlocked ? 0 : 1)
   }, 0)
 }
+
+export const generateSeatMatrix = (rows: number, cols: number): BasicSeat[][] => {
+  return Array.from({ length: rows }, () => Array(cols).fill({} as BasicSeat))
+}
+export const generateSeatArray = (rows: number, cols: number): BasicSeat[] => {
+  return mapMatrixToArrayOfPair(generateSeatMatrix(rows, cols))
+}
