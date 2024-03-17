@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import {
@@ -19,9 +19,19 @@ const DepartmentFilter = () => {
   const router = useRouter()
   const newSearchParams = new URLSearchParams(searchParams.toString())
 
+  useEffect(() => {
+    if (departments.data && departments.data.length > 0) {
+      if (!newSearchParams.get("departmentId")) {
+        newSearchParams.set("departmentId", departments.data[0].id)
+        router.push(pathname + "?" + newSearchParams.toString())
+      }
+    }
+  })
+
   return (
     <div>
       <Select
+        value={newSearchParams.get("departmentId") || "all"}
         onValueChange={(val) => {
           if (val === "all") newSearchParams.delete("departmentId")
           else newSearchParams.set("departmentId", val)
@@ -32,9 +42,6 @@ const DepartmentFilter = () => {
           <SelectValue placeholder="Dept" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem key={`department-1`} value={"all"}>
-            All
-          </SelectItem>
           {departments.data?.map((department) => (
             <SelectItem key={department.id} value={department.id}>
               {department.code}

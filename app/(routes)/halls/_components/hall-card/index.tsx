@@ -57,7 +57,6 @@ const HallCard = ({
   }, [])
 
   const cancelEditing = useCallback(() => {
-    console.log("hi")
     setHallState(transformHall(editHall.data ?? initialHall))
     setIsEditing(false)
   }, [editHall.data, initialHall])

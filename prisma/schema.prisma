@@ -27,8 +27,7 @@ model User {
   password      String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
-  accounts Account[]
+  accounts      Account[]
 }
 
 model College {
@@ -84,49 +83,37 @@ model Student {
 }
 
 model Hall {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  capacity Int
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  hallno Int
 
-  rows        Int
-  cols        Int
-  seats       Seat[]
-  hallno      Int
-  type        HallArrangementType? @default(NORMAL)
-  hallHistory HallHistory[]
+  rows  Int
+  cols  Int
+  seats Seat[]
+
+  type HallArrangementType? @default(NORMAL)
+
+  // HALL HISTORY
+  rootHallId  String? @db.ObjectId
+  rootHall    Hall?   @relation("hallHistory", fields: [rootHallId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  hallHistory Hall[]  @relation("hallHistory")
 
   departmentId String     @db.ObjectId
   department   Department @relation(fields: [departmentId], references: [id])
-
-  @@index([hallno, departmentId], name: "hall_index")
-}
-
-model HallHistory {
-  id     String              @id @default(auto()) @map("_id") @db.ObjectId
-  hallId String              @db.ObjectId
-  hall   Hall                @relation(fields: [hallId], references: [id])
-  rows   Int
-  cols   Int
-  seats  Seat[]
-  type   HallArrangementType
-  status String
-  examId String              @db.ObjectId
-  exam   Exam                @relation(fields: [examId], references: [id])
+  Exam         Exam?      @relation(fields: [examId], references: [id])
+  examId       String?    @db.ObjectId
 }
 
 model Seat {
-  id            String       @id @default(auto()) @map("_id") @db.ObjectId
-  row           Int
-  col           Int
-  isBlocked     Boolean      @default(false)
-  student       Student?     @relation(fields: [studentId], references: [id])
-  studentId     String?      @db.ObjectId
-  hallId        String       @db.ObjectId
-  hall          Hall         @relation(fields: [hallId], references: [id])
-  hallHistoryId String?      @db.ObjectId
-  hallHistory   HallHistory? @relation(fields: [hallHistoryId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  row       Int
+  col       Int
+  isBlocked Boolean  @default(false)
+  student   Student? @relation(fields: [studentId], references: [id])
+  studentId String?  @db.ObjectId
+  hallId    String   @db.ObjectId
+  hall      Hall     @relation(fields: [hallId], references: [id], onDelete: Cascade)
 
   @@index([row, col, hallId], name: "seat_index")
-  @@index([row, col, hallHistoryId], name: "seat_index_history")
 }
 
 enum ExamType {
@@ -144,9 +131,8 @@ model Exam {
   departmentId String?     @db.ObjectId
   department   Department? @relation(fields: [departmentId], references: [id])
 
-  students    Student[]
-  // hall        Hall[]
-  hallHistory HallHistory[]
+  students Student[]
+  hall     Hall[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -190,24 +176,3 @@ model VerificationToken {
 
   @@unique([email, token])
 }
-
-
-// model HallHistory {
-//   id            String              @id @default(auto()) @map("_id") @db.ObjectId
-//   hallId        String              @db.ObjectId
-//   hall          Hall                @relation(fields: [hallId], references: [id])
-//   capacity      Int
-//   rows          Int
-//   cols          Int
-//   seats         Seat[]
-//   hallno        Int
-//   type          HallArrangementType? @default(NORMAL)
-//   hallHistory   HallHistory[]
-//   departmentId  String              @db.ObjectId
-//   department    Department          @relation(fields: [departmentId], references: [id])
-//   status        String
-//   examId        String              @db.ObjectId
-//   exam          Exam                @relation(fields: [examId], references: [id])
-
-//   @@index([hallno, departmentId], name: "hall_history_index")
-// }

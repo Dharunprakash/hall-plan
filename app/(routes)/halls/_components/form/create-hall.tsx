@@ -1,6 +1,6 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { HallSchema } from "@/schemas/hall"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -8,6 +8,7 @@ import toast from "react-hot-toast"
 import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
+import { DialogClose } from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -27,18 +28,15 @@ import {
 import { trpc } from "@/app/_trpc/client"
 
 export function HallForm() {
-  const searchParams = useSearchParams()
+  const router = useRouter()
   const departments = trpc.department.getAll.useQuery()
   const utils = trpc.useUtils()
   const create = trpc.hall.create.useMutation({
-    onSuccess: (data) => {
-      utils.hall.getAll.cancel()
-      utils.hall.getAll.setData(data.departmentId, (prev) => {
-        if (!prev) return []
-        return [...prev, data]
-      })
+    onSuccess: () => {
+      utils.hall.getAll.invalidate()
       toast.remove()
       toast.success("Hall created")
+      router.refresh()
     },
     onError: (error) => {
       toast.remove()
@@ -51,10 +49,9 @@ export function HallForm() {
       hallno: 101,
       rows: 6,
       cols: 5,
-      capacity: 30,
-      departmentId: searchParams.get("departmentId") || "",
     },
   })
+  const { isValid } = form.formState
   const onSubmit = async (data: z.infer<typeof HallSchema>) => {
     toast.loading("Creating hall")
     console.log(data)
@@ -66,13 +63,16 @@ export function HallForm() {
   }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid gap-x-2 space-y-8 sm:grid-cols-2"
+      >
         <FormField
           control={form.control}
           name="departmentId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Dept</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -80,9 +80,6 @@ export function HallForm() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem key={`department-1`} value={"all"}>
-                    All
-                  </SelectItem>
                   {departments.data?.map((department) => (
                     <SelectItem
                       key={department.id}
@@ -101,7 +98,7 @@ export function HallForm() {
           control={form.control}
           name="hallno"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="!mt-0">
               <FormLabel>Hall No</FormLabel>
               <FormControl>
                 <Input
@@ -157,27 +154,17 @@ export function HallForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="capacity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Capacity</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  onChange={(e) => {
-                    field.onChange(e.target.valueAsNumber)
-                  }}
-                  placeholder="Capacity"
-                  type="number"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Submit</Button>
+        {isValid ? (
+          <DialogClose asChild>
+            <Button type="submit" className="col-span-2">
+              Submit
+            </Button>
+          </DialogClose>
+        ) : (
+          <Button type="submit" className="col-span-2">
+            Submit
+          </Button>
+        )}
       </form>
     </Form>
   )
