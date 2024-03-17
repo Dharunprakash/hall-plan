@@ -1,4 +1,6 @@
-export const mapArrayOfPairToMatrix = <T extends { row: number; col: number }>(
+import { BasicSeat, SeatPosition, SeatStatus } from "@/types/seat"
+
+export const mapArrayOfPairToMatrix = <T extends SeatPosition>(
   arr: T[],
   rows: number,
   cols: number
@@ -10,7 +12,7 @@ export const mapArrayOfPairToMatrix = <T extends { row: number; col: number }>(
   return matrix
 }
 
-export const mapMatrixToArrayOfPair = <T extends { row: number; col: number }>(
+export const mapMatrixToArrayOfPair = <T extends SeatPosition>(
   matrix: T[][]
 ): T[] => {
   const arr: T[] = []
@@ -23,10 +25,17 @@ export const mapMatrixToArrayOfPair = <T extends { row: number; col: number }>(
   }
   return arr
 }
-export const getHallCapacity = <T extends { seats: { isBlocked: boolean }[] }>(
+export const getHallCapacity = <T extends { seats: SeatStatus[] }>(
   hall: T
 ): number => {
   return hall.seats.reduce((acc, seat) => {
+    return acc + (seat.isBlocked ? 0 : 1)
+  }, 0)
+}
+
+export const getCapacity = <T extends BasicSeat[]>(seatMatrix: T[]): number => {
+  const seats = mapMatrixToArrayOfPair(seatMatrix)
+  return seats.reduce((acc, seat) => {
     return acc + (seat.isBlocked ? 0 : 1)
   }, 0)
 }

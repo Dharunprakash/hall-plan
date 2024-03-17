@@ -5,8 +5,8 @@ import DialogModal from "@/components/modal/dialog-modal"
 import { serverClient } from "@/app/_trpc/serverClient"
 
 import DepartmentFilter from "./_components/department-filter"
+import { HallForm } from "./_components/form/create-hall"
 import HallCard from "./_components/hall-card"
-import { HallForm } from "./_components/hall-form"
 
 const page = async ({
   searchParams,

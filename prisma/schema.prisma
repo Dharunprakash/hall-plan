@@ -89,26 +89,30 @@ model Hall {
   rows        Int
   cols        Int
   seats       Seat[]
-  hallno      Int              
+  hallno      Int
   type        HallArrangementType? @default(NORMAL)
   hallHistory HallHistory[]
 
   departmentId String     @db.ObjectId
   department   Department @relation(fields: [departmentId], references: [id])
+
   @@index([hallno, departmentId], name: "hall_index")
 }
 
 model Seat {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  row       Int
-  col       Int
-  isBlocked Boolean      @default(false)
-  student   Student?     @relation(fields: [studentId], references: [id])
-  studentId String?      @db.ObjectId
-  hallId    String       @db.ObjectId
-  hall      Hall         @relation(fields: [hallId], references: [id])
-  historyId String?      @db.ObjectId
-  history   HallHistory? @relation(fields: [historyId], references: [id])
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  row           Int
+  col           Int
+  isBlocked     Boolean      @default(false)
+  student       Student?     @relation(fields: [studentId], references: [id])
+  studentId     String?      @db.ObjectId
+  hallId        String       @db.ObjectId
+  hall          Hall         @relation(fields: [hallId], references: [id])
+  hallHistoryId String?      @db.ObjectId
+  hallHistory   HallHistory? @relation(fields: [hallHistoryId], references: [id])
+
+  @@index([row, col, hallId], name: "seat_index")
+  @@index([row, col, hallHistoryId], name: "seat_index_history")
 }
 
 model History {
