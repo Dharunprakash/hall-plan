@@ -12,22 +12,15 @@ export const HallSchema = z
     cols: z.number().min(1, {
       message: "col is required",
     }),
-    capacity: z.number().min(1, {
-      message: "capacity is required",
-    }),
-    departmentId: z.string().min(1, {
-      message: "department is required",
-    }),
+    departmentId: z
+      .string()
+      .min(12, {
+        message: "department is required",
+      })
+      .refine((d) => d !== "-", {
+        message: "department is required",
+      }),
   })
-  .refine(
-    (data) => {
-      return data.rows * data.cols <= data.capacity
-    },
-    {
-      path: ["capacity"],
-      message: "rows * cols should be less than or equal to capacity",
-    }
-  )
   .refine(
     async (data) => {
       return await checkSameHallNoExists(data.hallno, data.departmentId)

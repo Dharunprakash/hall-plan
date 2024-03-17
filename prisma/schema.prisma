@@ -27,8 +27,7 @@ model User {
   password      String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
-  accounts Account[]
+  accounts      Account[]
 }
 
 model College {
@@ -55,6 +54,7 @@ model Department {
   code     String
   students Student[]
   halls    Hall[]
+  exams    Exam[]
 
   @@index([name], name: "department_index")
   @@index([code], name: "department_index_code")
@@ -71,8 +71,8 @@ model Student {
   vertical String? @default("NONE")
   batch    String? @default("2021-2025")
 
-  hallId String?      @db.ObjectId
-  hall   HallHistory? @relation(fields: [hallId], references: [id])
+  examId String? @db.ObjectId
+  exam   Exam?   @relation(fields: [examId], references: [id])
 
   departmentId String     @db.ObjectId
   department   Department @relation(fields: [departmentId], references: [id])
@@ -83,57 +83,59 @@ model Student {
 }
 
 model Hall {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  capacity Int
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  hallno Int
 
-  rows        Int
-  cols        Int
-  seats       Seat[]
-  hallno      Int
-  type        HallArrangementType? @default(NORMAL)
-  hallHistory HallHistory[]
+  rows  Int
+  cols  Int
+  seats Seat[]
+
+  type HallArrangementType? @default(NORMAL)
+
+  // HALL HISTORY
+  rootHallId  String? @db.ObjectId
+  rootHall    Hall?   @relation("hallHistory", fields: [rootHallId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  hallHistory Hall[]  @relation("hallHistory")
 
   departmentId String     @db.ObjectId
   department   Department @relation(fields: [departmentId], references: [id])
-
-  @@index([hallno, departmentId], name: "hall_index")
+  Exam         Exam?      @relation(fields: [examId], references: [id])
+  examId       String?    @db.ObjectId
 }
 
 model Seat {
-  id            String       @id @default(auto()) @map("_id") @db.ObjectId
-  row           Int
-  col           Int
-  isBlocked     Boolean      @default(false)
-  student       Student?     @relation(fields: [studentId], references: [id])
-  studentId     String?      @db.ObjectId
-  hallId        String       @db.ObjectId
-  hall          Hall         @relation(fields: [hallId], references: [id])
-  hallHistoryId String?      @db.ObjectId
-  hallHistory   HallHistory? @relation(fields: [hallHistoryId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  row       Int
+  col       Int
+  isBlocked Boolean  @default(false)
+  student   Student? @relation(fields: [studentId], references: [id])
+  studentId String?  @db.ObjectId
+  hallId    String   @db.ObjectId
+  hall      Hall     @relation(fields: [hallId], references: [id], onDelete: Cascade)
 
   @@index([row, col, hallId], name: "seat_index")
-  @@index([row, col, hallHistoryId], name: "seat_index_history")
 }
 
-model History {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  hallHistory HallHistory[]
+enum ExamType {
+  THEORY
+  PRACTICAL
+  MODEL_PRACTICAL
+  INTERNAL
 }
 
-model HallHistory {
-  id       String              @id @default(auto()) @map("_id") @db.ObjectId
-  hallId   String              @db.ObjectId
-  hall     Hall                @relation(fields: [hallId], references: [id])
-  rows     Int
-  cols     Int
-  seats    Seat[]
-  type     HallArrangementType
-  status   String
-  modified DateTime            @default(now())
+model Exam {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  type         ExamType    @default(INTERNAL)
+  // ONLY FOR INTERNAL AND MODEL_PRACTICAL THE DEPARTMENT IS REQUIRED
+  departmentId String?     @db.ObjectId
+  department   Department? @relation(fields: [departmentId], references: [id])
+
   students Student[]
+  hall     Hall[]
 
-  historyId String  @db.ObjectId
-  history   History @relation(fields: [historyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // The Account model is used by the NextAuth.js authentication library

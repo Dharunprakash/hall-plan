@@ -31,7 +31,7 @@ const page = async ({
           <HallForm />
         </DialogModal>
       </div>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {halls.map((hall) => (
           <HallCard key={hall.id} hall={hall} className="mt-2" />
         ))}

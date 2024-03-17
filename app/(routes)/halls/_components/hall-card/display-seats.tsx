@@ -13,7 +13,7 @@ const DisplaySeats = ({
   toggleBlockSeat: (row: number, col: number) => void
 }) => {
   return (
-    <div className="mx-auto w-full">
+    <div className="mx-auto w-full max-w-full overflow-x-auto">
       <table className="table-bordered mx-auto table">
         <tbody>
           {seats.map((row, i) => (
