@@ -1,3 +1,4 @@
+import { HallWithDeptAndBasicSeats, HallWithSeatsAndDept } from "@/types/hall"
 import { BasicSeat, SeatPosition, SeatStatus } from "@/types/seat"
 
 export const mapArrayOfPairToMatrix = <T extends SeatPosition>(
@@ -39,3 +40,58 @@ export const getCapacity = <T extends BasicSeat[]>(seatMatrix: T[]): number => {
     return acc + (seat.isBlocked ? 0 : 1)
   }, 0)
 }
+
+export const generateSeatMatrix = (
+  rows: number,
+  cols: number
+): BasicSeat[][] => {
+  if (!rows || !cols) return []
+  const emptyMatrix: BasicSeat[][] = Array.from({ length: rows }, () =>
+    Array(cols).fill({})
+  )
+  // fill the matrix with empty seats with
+  // row and col properties
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      emptyMatrix[row][col] = {
+        row,
+        col,
+        isBlocked: false,
+      }
+    }
+  }
+  return emptyMatrix
+}
+
+export const updateSeatMatrixDimensions = (
+  seatMatrix: BasicSeat[][],
+  rows: number,
+  cols: number
+): BasicSeat[][] => {
+  const newMatrix = generateSeatMatrix(rows, cols)
+  for (let row = 0; row < Math.min(seatMatrix.length, rows); row++) {
+    for (let col = 0; col < Math.min(seatMatrix[row].length, cols); col++) {
+      newMatrix[row][col] = seatMatrix[row][col]
+    }
+  }
+  return newMatrix
+}
+
+export const generateSeatArray = (rows: number, cols: number): BasicSeat[] => {
+  return mapMatrixToArrayOfPair(generateSeatMatrix(rows, cols))
+}
+
+export const transformHall = (
+  hall: HallWithSeatsAndDept
+): HallWithDeptAndBasicSeats => ({
+  ...hall,
+  seats: mapArrayOfPairToMatrix<BasicSeat>(
+    hall.seats.map((seat) => ({
+      row: seat.row,
+      col: seat.col,
+      isBlocked: seat.isBlocked,
+    })),
+    hall.rows,
+    hall.cols
+  ),
+})

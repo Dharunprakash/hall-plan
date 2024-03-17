@@ -42,4 +42,52 @@ export const hallRouter = router({
       )
       return { ...hall, seats: seats }
     }),
+  edit: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        rows: z.number(),
+        cols: z.number(),
+        seats: z.array(
+          z.object({
+            isBlocked: z.boolean(),
+            row: z.number(),
+            col: z.number(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ input }): Promise<HallWithSeatsAndDept> => {
+      // check if seats are unchanged, then make no changes
+
+      // check if rows and cols are unchanged, then update seats only if isBlocked is changed
+
+      // check if rows are less than input.rows, then add rows
+
+      // check if cols are less than input.cols, then add cols
+
+      // check if rows are greater than input.rows, then remove rows
+
+      // check if cols are greater than input.cols, then remove cols
+
+      await db.seat.deleteMany({ where: { hallId: input.id } })
+      const seats: Seat[] = await Promise.all(
+        input.seats.map(async (seat) => {
+          return await db.seat.create({
+            data: {
+              hallId: input.id,
+              row: seat.row,
+              col: seat.col,
+              isBlocked: seat.isBlocked,
+            },
+          })
+        })
+      )
+      const hall = await db.hall.update({
+        where: { id: input.id },
+        data: { rows: input.rows, cols: input.cols },
+        include: { department: true },
+      })
+      return { ...hall, seats }
+    }),
 })
