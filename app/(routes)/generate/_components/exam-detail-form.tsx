@@ -10,6 +10,7 @@ import { format } from "date-fns"
 import { useForm } from "react-hook-form"
 import { toast } from "react-hot-toast"
 import * as z from "zod"
+import {Select, SelectSection, SelectItem} from "@nextui-org/react";
 
 import {
   Form,
@@ -20,9 +21,16 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select"
 import { trpc } from "@/app/_trpc/client"
 
-export const VehicleForm = ({ onClose }: { onClose?: () => void }) => {
+export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
   const utils = trpc.useUtils()
   const router = useRouter()
   // const createVehicle = trpc.vehicles.create.useMutation({
@@ -95,6 +103,25 @@ export const VehicleForm = ({ onClose }: { onClose?: () => void }) => {
         <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2">
           <FormField
             control={form.control}
+            name="applicationfor"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Application for</FormLabel>
+                <Select
+                className="text-muted-foreground"
+                placeholder="Select application for the post of"
+                >
+                  <SelectItem value={"THEORY"} key={'THEORY'}> THEORY</SelectItem>
+                  <SelectItem value={'PRACTICAL'} key={'PRACTICAL'}> PRACTICAL</SelectItem>
+                  <SelectItem value={"MODEL_PRACTICAL"} key={'MODEL_PRACTICAL'}>MODEL_PRACTICAL</SelectItem>
+                  <SelectItem value={'INTERNAL'} key={'INTERNAL'}>INTERNAL</SelectItem>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="examName"
             render={({ field }) => (
               <FormItem>
@@ -108,6 +135,24 @@ export const VehicleForm = ({ onClose }: { onClose?: () => void }) => {
                     }}
                   />
                 </FormControl>
+                <FormField
+                    control={form.control}
+                    name="semester"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Semester</FormLabel>
+
+                        <Select
+                          {...field}
+                          placeholder="Select Semester"        
+                        >
+                            <SelectItem key={"ODD"} value={"ODD"}>ODD</SelectItem>
+                            <SelectItem key={"ODD"} value={"EVEN"}>EVEN</SelectItem>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                 <FormMessage />
               </FormItem>
