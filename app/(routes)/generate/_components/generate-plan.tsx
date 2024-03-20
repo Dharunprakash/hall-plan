@@ -15,15 +15,12 @@ import NextuiModal from "@/components/modal/nextui-modal"
 import { trpc } from "@/app/_trpc/client"
 
 import { years } from "../../students/_components/data"
+import HallHistory from "./hall-history-table"
 
 export default function GeneratePlan() {
   return (
     <>
-      {
-        <NextuiModal title="Generate Hall plan" action={<></>} close={<></>}>
-          {" "}
-        </NextuiModal>
-      }
+      <HallHistory />
     </>
   )
 }
