@@ -4,6 +4,7 @@ import { Student } from "@prisma/client"
 
 import { HallWithSeatsWithStudentsAndDept } from "@/types/hall"
 import { db } from "@/lib/db"
+import { groupHallByStudentYear } from "@/lib/hall/utils"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { serverClient } from "@/app/_trpc/serverClient"
@@ -11,6 +12,7 @@ import { serverClient } from "@/app/_trpc/serverClient"
 import AttendanceTable from "./_components/attendance-table"
 import DisplayPlan from "./_components/display-plan"
 import HallArrangementTable from "./_components/hall-arrangement-table"
+import HallPlanTable from "./_components/hall-plan-table"
 import VerticalCount from "./_components/vertical-details"
 
 const Page = async ({
@@ -20,7 +22,7 @@ const Page = async ({
     id: string
   }
 }) => {
-  const hall: HallWithSeatsWithStudentsAndDept = (await db.hall.findFirst({
+  const halls: HallWithSeatsWithStudentsAndDept[] = (await db.hall.findMany({
     include: {
       department: true,
       seats: {
@@ -30,6 +32,20 @@ const Page = async ({
       },
     },
   }))!
+  const grouped = groupHallByStudentYear(halls)
+  console.log(grouped)
+  return (
+    <div>
+      {Object.entries(grouped).map(([yearSem, halls]) => (
+        <HallPlanTable
+          key={yearSem}
+          year={Number(yearSem.split("-")[0])}
+          semester={Number(yearSem.split("-")[1])}
+          halls={Array.from(halls)}
+        />
+      ))}
+    </div>
+  )
 
   // return (
   //   <VerticalCount
@@ -41,8 +57,8 @@ const Page = async ({
   //     }}
   //   />
   // )
-  return <AttendanceTable hall={hall} />
-  return <HallArrangementTable hall={hall} />
+  // return <AttendanceTable hall={hall} />
+  // return <HallArrangementTable hall={hall} />
   const { id } = params
   const examDetail = await serverClient.exam.get(id)
   if (!examDetail) {

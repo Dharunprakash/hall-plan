@@ -1,66 +1,18 @@
-// @ts-ignore
-import React from "react"
-
 import { HallWithSeatsWithStudentsAndDept } from "@/types/hall"
+import { segregateHallsBySection } from "@/lib/hall/utils"
+import { intToRoman } from "@/lib/utils"
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-
-const groupHallByStudentYear = (halls: HallWithSeatsWithStudentsAndDept[]) => {
-  const grouped: Record<string, HallWithSeatsWithStudentsAndDept[]> = {}
-  halls.forEach((hall) => {
-    hall.seats.forEach((seat) => {
-      if (!seat.student) return
-
-      const year = seat.year
-      const semester = seat.semester
-      if (!year || !semester) return
-      if (!grouped[`${year}-${semester}`]) {
-        grouped[`${year}-${semester}`] = []
-      }
-      grouped[`${year}-${semester}`].push(hall)
-    })
-  })
-  return grouped
-}
-
-export const segregateHallsBySection = (
-  halls: HallWithSeatsWithStudentsAndDept[]
-) => {
-  const pairsHallsAndSections: Record<
-    string,
-    (HallWithSeatsWithStudentsAndDept & {
-      section: string
-      startRollNo: number
-      endRollNo: number
-    })[]
-  > = {}
-  for (const hall of halls) {
-    for (const seat of hall.seats) {
-      if (!seat.student) continue
-      const section = seat.student.section
-      if (!pairsHallsAndSections[section]) {
-        pairsHallsAndSections[section] = []
-      }
-    }
-  }
-  const hallPlans: [string, HallWithSeatsWithStudentsAndDept][] = []
-  for (const section in pairsHallsAndSections) {
-    for (const hall of pairsHallsAndSections[section]) {
-      hallPlans.push([section, hall])
-    }
-  }
-  return { pairsHallsAndSections, hallPlans }
-}
 
 const HallPlanTable = ({
   year,
   semester,
   halls,
 }: {
-  year: string
-  semester: string
+  year: number
+  semester: number
   halls: HallWithSeatsWithStudentsAndDept[]
 }) => {
-  const { hallPlans } = segregateHallsBySection(halls)
+  const { hallPlans } = segregateHallsBySection(halls, year)
   return (
     <ScrollArea className="whitespace-nowrap rounded-md max-sm:mx-2 max-sm:w-screen max-sm:border max-sm:px-2">
       <div className="table-responsive">
@@ -111,29 +63,29 @@ const HallPlanTable = ({
           </thead>
           <tbody>
             {hallPlans.map(([section, hall], ind) => (
-              <tr>
+              <tr key={hall.id}>
                 {ind == 0 && (
                   <td
                     className={`border px-4 py-2 text-center`}
-                    rowSpan={halls.length}
+                    rowSpan={hallPlans.length}
                   >
-                    {year} / {semester}
+                    {intToRoman(year)} / {intToRoman(semester)}
                   </td>
                 )}
                 <td className="border px-4 py-2 text-center">{section}</td>
                 <td className="border px-4 py-2 text-center">
-                  {/* {hall.rollNo.from} */}
+                  {hall.startRollNo}
                 </td>
                 <td className="border px-4 py-2 text-center">
-                  {/* {hall.rollNo.to} */}
+                  {hall.endRollNo}
                 </td>
                 <td className="border px-4 py-2 text-center">{hall.hallno}</td>
                 {ind == 0 && (
                   <td
-                    // rowSpan={data.length}
+                    rowSpan={hallPlans.length}
                     className="border px-4 py-2 text-center"
                   >
-                    {/* {hall.dept} */}
+                    {hall.department.code}
                   </td>
                 )}
               </tr>

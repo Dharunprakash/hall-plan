@@ -1,4 +1,10 @@
-import { HallWithDeptAndBasicSeats, HallWithSeatsAndDept } from "@/types/hall"
+import {
+  HallPlan,
+  HallPlanExtra,
+  HallWithDeptAndBasicSeats,
+  HallWithSeatsAndDept,
+  HallWithSeatsWithStudentsAndDept,
+} from "@/types/hall"
 import { BasicSeat, SeatPosition, SeatStatus } from "@/types/seat"
 
 export const mapArrayOfPairToMatrix = <T extends SeatPosition>(
@@ -95,3 +101,75 @@ export const transformHall = (
     hall.cols
   ),
 })
+
+export const groupHallByStudentYear = (
+  halls: HallWithSeatsWithStudentsAndDept[]
+) => {
+  const grouped: Record<string, Set<HallWithSeatsWithStudentsAndDept>> = {}
+  halls.forEach((hall) => {
+    hall.seats.forEach((seat) => {
+      if (!seat.student) return
+
+      const year = seat.year
+      const semester = seat.semester
+      if (!year || !semester) return
+      if (!grouped[`${year}-${semester}`]) {
+        grouped[`${year}-${semester}`] = new Set()
+      }
+      grouped[`${year}-${semester}`].add(hall)
+    })
+  })
+
+  return grouped
+}
+
+export const segregateHallsBySection = (
+  halls: HallWithSeatsWithStudentsAndDept[],
+  year: number
+) => {
+  const pairsHallsAndSections: Record<string, HallPlan[]> = {}
+  const hallPlans: [string, HallPlan][] = []
+  for (const hall of halls) {
+    const sections: Record<string, HallPlanExtra> = {}
+    for (const seat of hall.seats) {
+      if (!seat.student) continue
+      const { year: studentYear, semester: studentSemester } = seat
+      const { rollno, section } = seat.student
+      if (!section || !studentSemester || !studentYear) continue
+      if (!sections[section]) {
+        sections[section] = {
+          year: studentYear,
+          semester: studentSemester,
+          section,
+          startRollNo: rollno,
+          endRollNo: rollno,
+        }
+      } else {
+        const existingSections = sections[section]!
+        sections[section] = {
+          section,
+          year: studentYear,
+          semester: studentSemester,
+          startRollNo: Math.min(rollno, existingSections.startRollNo),
+          endRollNo: Math.max(rollno, existingSections.endRollNo),
+        }
+      }
+    }
+    for (const section in sections) {
+      const sectionData = sections[section]
+      if (sectionData.year === year) {
+        if (!pairsHallsAndSections[section]) {
+          pairsHallsAndSections[section] = []
+        }
+        pairsHallsAndSections[section].push({ ...hall, ...sectionData })
+      }
+    }
+  }
+
+  for (const section in pairsHallsAndSections) {
+    for (const hall of pairsHallsAndSections[section]) {
+      hallPlans.push([section, hall])
+    }
+  }
+  return { pairsHallsAndSections, hallPlans }
+}

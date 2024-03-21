@@ -19,3 +19,13 @@ export type HallWithDeptAndBasicSeats = HallWithDept & {
 export type HallWithSeatsWithStudentsAndDept = HallWithDept & {
   seats: SeatWithStudent[]
 }
+
+export type HallPlanExtra = {
+  year: number
+  semester: number
+  section: string
+  startRollNo: number
+  endRollNo: number
+}
+
+export type HallPlan = HallWithSeatsWithStudentsAndDept & HallPlanExtra

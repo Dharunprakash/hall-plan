@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-import DisplayChosenDates from "./dispaly-choosen-dates"
+import DisplayChosenDates from "./display-choosen-dates"
 
 const formSchema = z.object({
   date: z.string().nonempty("Date is required"),
