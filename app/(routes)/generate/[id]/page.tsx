@@ -33,7 +33,6 @@ const Page = async ({
     },
   }))!
   const grouped = groupHallByStudentYear(halls)
-  console.log(grouped)
   return (
     <div>
       {grouped.map(([key, halls]) => {
