@@ -19,13 +19,13 @@ const formSchema = z.object({
   date: z.string().nonempty("Date is required"),
 })
 
-const DurationDetails = () => {
+const DateForm = ({onClose}:{onClose?:()=>void}) => {
   const { addDate } = useDurationDetails()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   })
 
-  function handleSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values)
     addDate(values.date)
   }
@@ -33,38 +33,40 @@ const DurationDetails = () => {
   return (
     <div>
       <DisplayChosenDates />
-      <div className="grid grid-cols-2 align-bottom">
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <>
-                  <Input
-                    className="max-w-xs"
-                    placeholder="shadcn"
-                    {...field}
-                    type="date"
-                    onChange={(e) => {
-                      field.onChange(e)
-                    }}
-                  />
-                </>
-              </FormControl>
-              <FormMessage>{form.formState.errors.date?.message}</FormMessage>
-            </FormItem>
-          )}
-        />
-        <Button
-          onClick={() => form.handleSubmit(handleSubmit)()}
-          variant="secondary"
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mt-2 flex max-w-xl flex-row items-center gap-2"
         >
-          Add Exam Date
-        </Button>
-      </div>
-    </div>
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <>
+                    <Input
+                      className="max-w-xs"
+                      placeholder="shadcn"
+                      {...field}
+                      type="date"
+                      onChange={(e) => {
+                        field.onChange(e);
+                      }}
+                    />
+                  </>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" variant={"secondary"}>
+            Add Exam Date
+          </Button>
+        </form>
+      </Form>
+    </div> 
   )
 }
 
-export default DurationDetails
+export default DateForm

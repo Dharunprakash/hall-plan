@@ -18,16 +18,26 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { trpc } from "@/app/_trpc/client"
+import { usegenerateForm } from "@/hooks/use-generate-form"
 
 export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
   const router = useRouter()
+  const {step,setStep,examDetailForm,setExamDetailForm}= usegenerateForm()
   const form = useForm<z.infer<typeof ExamDetailsType>>({
     resolver: zodResolver(ExamDetailsType),
+    defaultValues: {
+      name: "",
+      academicYear: "",
+      semester:undefined,
+      departmentId: "",
+    },
   })
   console.log(form.formState.isValid)
   console.log(form.getValues())
   const [testType, setTestType] = useState("")
   const onSubmit = async (values: z.infer<typeof ExamDetailsType>) => {
+    setStep(step+1)
+    setExamDetailForm(values)
     console.log(values)
   }
   const { data: departments } = trpc.department.getAll.useQuery()
@@ -124,9 +134,7 @@ export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Department</FormLabel>
-                  {!departments ? (
-                    <Skeleton />
-                  ) : (
+                  {departments && (
                     <Select
                       placeholder="Select Department"
                       onChange={field.onChange}
