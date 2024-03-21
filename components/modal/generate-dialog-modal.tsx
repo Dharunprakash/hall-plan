@@ -49,7 +49,7 @@ export default function VechicleFormModal({
               <ModalHeader className="flex flex-col gap-1">
                 <div className="text-center">
                   <div className="text-center">
-                    {GenerateId ? "Edit" : "Create"} Details
+                    {GenerateId ? "Edit" : "Create"} Hall
                   </div>
                 </div>
               </ModalHeader>

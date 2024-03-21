@@ -1,7 +1,6 @@
 import { z } from "zod"
 import { create } from "zustand"
 
-
 interface GenerateFormState {
   step: number
   setStep: (step: number) => void

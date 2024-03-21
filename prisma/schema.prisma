@@ -123,6 +123,11 @@ enum ExamType {
   INTERNAL
 }
 
+enum OddEven {
+  ODD
+  EVEN
+}
+
 model Exam {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   name         String
@@ -131,8 +136,13 @@ model Exam {
   departmentId String?     @db.ObjectId
   department   Department? @relation(fields: [departmentId], references: [id])
 
-  students Student[]
-  hall     Hall[]
+  semester     OddEven
+  students     Student[]
+  halls        Hall[]
+  academicYear String
+  dates        DateTime[]
+  timingFn     DateTime
+  timingAn     DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
