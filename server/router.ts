@@ -1,6 +1,6 @@
 import { collegeRouter } from "./college"
 import { departmentRouter } from "./department"
-import { generateRouter } from "./generate"
+import { examRouter } from "./exam"
 import { hallRouter } from "./hall"
 import { studentRouter } from "./student"
 import { publicProcedure, router } from "./trpc"
@@ -13,6 +13,6 @@ export const appRouter = router({
   college: collegeRouter,
   department: departmentRouter,
   hall: hallRouter,
-  generate: generateRouter,
+  exam: examRouter,
 })
 export type AppRouter = typeof appRouter

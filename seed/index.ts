@@ -61,3 +61,29 @@ export const initializeCollegeDetails = async () => {
     },
   })
 }
+
+export const fillSeats = async () => {
+  const students = await db.student.findMany({
+    take: 30,
+  })
+  const updateSeat = await db.seat.findMany({
+    take: 30,
+  })
+  const promises = students.map((student, i) => {
+    return db.seat.update({
+      where: {
+        id: updateSeat[i].id,
+      },
+      data: {
+        student: {
+          connect: {
+            id: student.id,
+          },
+        },
+      },
+    })
+  })
+  await Promise.all(promises)
+  console.log("Seats filled")
+  throw new Error("Seeds are not implemented")
+}
