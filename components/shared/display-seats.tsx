@@ -9,10 +9,12 @@ const DisplaySeats = ({
   seats,
   isEditing,
   toggleBlockSeat,
+  className,
 }: {
   color1?: string
   color2?: string
   seats: BasicSeat[][]
+  className?: string
 } & (
   | {
       isEditing: boolean
@@ -24,7 +26,7 @@ const DisplaySeats = ({
     }
 )) => {
   return (
-    <div className="mx-auto w-full max-w-full overflow-x-auto">
+    <div className={cn("mx-auto w-full max-w-full overflow-x-auto", className)}>
       <table className="table-bordered mx-auto table">
         <tbody>
           {seats.map((row, i) => (

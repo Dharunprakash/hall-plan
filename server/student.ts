@@ -23,13 +23,29 @@ export const studentRouter = router({
     return sortStudents(
       await db.student.findMany({
         include: { department: true },
-        orderBy: {
-          department: {
-            code: "asc",
+        orderBy: [
+          {
+            department: {
+              code: "asc",
+            },
           },
-        },
+          {
+            section: "asc",
+          },
+          {
+            rollno: "asc",
+          },
+        ],
       })
     )
+  }),
+  getAllMinimal: publicProcedure.query(async () => {
+    return await db.student.findMany({
+      select: {
+        departmentId: true,
+        year: true,
+      },
+    })
   }),
   upsertOne: publicProcedure
     .input(singleStudentSchema)

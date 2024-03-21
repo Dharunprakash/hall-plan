@@ -1,9 +1,15 @@
 import React from "react"
 
 import SelectHallType from "../_components/select-hall-type"
+import SelectStudents from "../_components/select-student"
 
 const page = () => {
-  return <SelectHallType />
+  return (
+    <div>
+      <SelectHallType />
+      <SelectStudents />
+    </div>
+  )
 }
 
 export default page
