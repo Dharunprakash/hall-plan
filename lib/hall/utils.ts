@@ -1,3 +1,5 @@
+import { HallArrangementType } from "@prisma/client"
+
 import {
   HallPlan,
   HallPlanExtra,
@@ -49,7 +51,8 @@ export const getCapacity = <T extends BasicSeat[]>(seatMatrix: T[]): number => {
 
 export const generateSeatMatrix = (
   rows: number,
-  cols: number
+  cols: number,
+  pattern?: HallArrangementType
 ): BasicSeat[][] => {
   if (!rows || !cols) return []
   const emptyMatrix: BasicSeat[][] = Array.from({ length: rows }, () =>
@@ -62,7 +65,12 @@ export const generateSeatMatrix = (
       emptyMatrix[row][col] = {
         row,
         col,
-        isBlocked: false,
+        isBlocked:
+          pattern === "STAGGERED"
+            ? (row + col) % 2 === 0
+            : pattern === "ALTERNATE"
+            ? col % 2 === 0
+            : false,
       }
     }
   }
@@ -104,32 +112,27 @@ export const transformHall = (
 
 export const groupHallByStudentYear = (
   halls: HallWithSeatsWithStudentsAndDept[]
-) => {
-  console.log(halls)
+): [string, HallWithSeatsWithStudentsAndDept[]][] => {
   const grouped: Record<string, Set<HallWithSeatsWithStudentsAndDept>> = {}
+
   halls.forEach((hall) => {
     hall.seats.forEach((seat) => {
       if (!seat.student) return
-      const dept = hall.department.code
       const { year, semester } = seat
       if (!year || !semester) return
+
       const key = JSON.stringify({
         year,
         semester,
-        dept,
+        dept: hall.department.code,
       })
-      if (!grouped[key]) {
-        grouped[key] = new Set()
-      }
+
+      grouped[key] = grouped[key] || new Set()
       grouped[key].add(hall)
     })
   })
-  console.log(grouped)
-  const res: [string, HallWithSeatsWithStudentsAndDept[]][] = Object.entries(
-    grouped
-  ).map(([key, halls]) => [key, Array.from(halls)])
-  console.log(res)
-  return res
+
+  return Object.entries(grouped).map(([key, halls]) => [key, Array.from(halls)])
 }
 
 export const segregateHallsBySection = (
@@ -138,47 +141,51 @@ export const segregateHallsBySection = (
 ) => {
   const pairsHallsAndSections: Record<string, HallPlan[]> = {}
   const hallPlans: [string, HallPlan][] = []
-  for (const hall of halls) {
+
+  halls.forEach((hall) => {
     const sections: Record<string, HallPlanExtra> = {}
-    for (const seat of hall.seats) {
-      if (!seat.student) continue
-      const { year: studentYear, semester: studentSemester } = seat
-      const { rollno, section } = seat.student
-      if (!section || !studentSemester || !studentYear) continue
-      if (!sections[section]) {
-        sections[section] = {
-          year: studentYear,
-          semester: studentSemester,
-          section,
-          startRollNo: rollno,
-          endRollNo: rollno,
-        }
-      } else {
-        const existingSections = sections[section]!
-        sections[section] = {
-          section,
-          year: studentYear,
-          semester: studentSemester,
-          startRollNo: Math.min(rollno, existingSections.startRollNo),
-          endRollNo: Math.max(rollno, existingSections.endRollNo),
-        }
+
+    hall.seats.forEach((seat) => {
+      if (!seat.student) return
+      const {
+        year: studentYear,
+        semester: studentSemester,
+        section,
+        rollno,
+      } = seat.student
+      if (!section || !studentSemester || !studentYear) return
+
+      sections[section] = sections[section] || {
+        year: studentYear,
+        semester: studentSemester,
+        section,
+        startRollNo: rollno,
+        endRollNo: rollno,
       }
-    }
-    for (const section in sections) {
-      const sectionData = sections[section]
+
+      sections[section].startRollNo = Math.min(
+        rollno,
+        sections[section].startRollNo
+      )
+      sections[section].endRollNo = Math.max(
+        rollno,
+        sections[section].endRollNo
+      )
+    })
+
+    Object.entries(sections).forEach(([section, sectionData]) => {
       if (sectionData.year === year) {
-        if (!pairsHallsAndSections[section]) {
-          pairsHallsAndSections[section] = []
-        }
+        pairsHallsAndSections[section] = pairsHallsAndSections[section] || []
         pairsHallsAndSections[section].push({ ...hall, ...sectionData })
       }
-    }
-  }
+    })
+  })
 
-  for (const section in pairsHallsAndSections) {
-    for (const hall of pairsHallsAndSections[section]) {
+  Object.entries(pairsHallsAndSections).forEach(([section, halls]) => {
+    halls.forEach((hall) => {
       hallPlans.push([section, hall])
-    }
-  }
+    })
+  })
+
   return { pairsHallsAndSections, hallPlans }
 }

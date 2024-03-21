@@ -12,7 +12,7 @@ datasource db {
 }
 
 enum HallArrangementType {
-  CHECKERBOARD
+  STAGGERED
   ALTERNATE
   NORMAL
 }
