@@ -36,14 +36,17 @@ const Page = async ({
   console.log(grouped)
   return (
     <div>
-      {Object.entries(grouped).map(([yearSem, halls]) => (
-        <HallPlanTable
-          key={yearSem}
-          year={Number(yearSem.split("-")[0])}
-          semester={Number(yearSem.split("-")[1])}
-          halls={Array.from(halls)}
-        />
-      ))}
+      {Object.entries(grouped).map(([key, halls]) => {
+        const { year, semester, dept } = JSON.parse(key)
+        return (
+          <HallPlanTable
+            key={key}
+            year={Number(year)}
+            semester={Number(semester)}
+            halls={Array.from(halls)}
+          />
+        )
+      })}
     </div>
   )
 

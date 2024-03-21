@@ -64,11 +64,37 @@ export const initializeCollegeDetails = async () => {
 
 export const fillSeats = async () => {
   const students = await db.student.findMany({
-    take: 30,
+    take: 120,
+    orderBy: [
+      {
+        section: "asc",
+      },
+      {
+        rollno: "asc",
+      },
+    ],
   })
+  console.log(students)
   const updateSeat = await db.seat.findMany({
-    take: 30,
+    take: 120,
+    orderBy: [
+      {
+        hall: {
+          department: {
+            code: "asc",
+          },
+        },
+      },
+      {
+        hall: {
+          hallno: "asc",
+        },
+      },
+      { row: "asc" },
+      { col: "asc" },
+    ],
   })
+  console.log(updateSeat)
   const promises = students.map((student, i) => {
     return db.seat.update({
       where: {
@@ -80,6 +106,8 @@ export const fillSeats = async () => {
             id: student.id,
           },
         },
+        year: student.year,
+        semester: student.semester,
       },
     })
   })

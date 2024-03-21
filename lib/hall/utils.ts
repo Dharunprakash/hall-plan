@@ -109,17 +109,20 @@ export const groupHallByStudentYear = (
   halls.forEach((hall) => {
     hall.seats.forEach((seat) => {
       if (!seat.student) return
-
-      const year = seat.year
-      const semester = seat.semester
+      const dept = hall.department.code
+      const { year, semester } = seat
       if (!year || !semester) return
-      if (!grouped[`${year}-${semester}`]) {
-        grouped[`${year}-${semester}`] = new Set()
+      const key = JSON.stringify({
+        year,
+        semester,
+        dept,
+      })
+      if (!grouped[key]) {
+        grouped[key] = new Set()
       }
-      grouped[`${year}-${semester}`].add(hall)
+      grouped[key].add(hall)
     })
   })
-
   return grouped
 }
 
