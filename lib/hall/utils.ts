@@ -105,6 +105,7 @@ export const transformHall = (
 export const groupHallByStudentYear = (
   halls: HallWithSeatsWithStudentsAndDept[]
 ) => {
+  console.log(halls)
   const grouped: Record<string, Set<HallWithSeatsWithStudentsAndDept>> = {}
   halls.forEach((hall) => {
     hall.seats.forEach((seat) => {
@@ -123,7 +124,12 @@ export const groupHallByStudentYear = (
       grouped[key].add(hall)
     })
   })
-  return grouped
+  console.log(grouped)
+  const res: [string, HallWithSeatsWithStudentsAndDept[]][] = Object.entries(
+    grouped
+  ).map(([key, halls]) => [key, Array.from(halls)])
+  console.log(res)
+  return res
 }
 
 export const segregateHallsBySection = (

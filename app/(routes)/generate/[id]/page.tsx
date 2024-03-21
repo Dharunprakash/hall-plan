@@ -36,7 +36,7 @@ const Page = async ({
   console.log(grouped)
   return (
     <div>
-      {Object.entries(grouped).map(([key, halls]) => {
+      {grouped.map(([key, halls]) => {
         const { year, semester, dept } = JSON.parse(key)
         return (
           <HallPlanTable
