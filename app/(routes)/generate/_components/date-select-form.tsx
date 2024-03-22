@@ -19,7 +19,7 @@ const formSchema = z.object({
   date: z.string().nonempty("Date is required"),
 })
 
-const DateForm = ({onClose}:{onClose?:()=>void}) => {
+const DateForm = ({ onClose }: { onClose?: () => void }) => {
   const { addDate } = useDurationDetails()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,7 +51,7 @@ const DateForm = ({onClose}:{onClose?:()=>void}) => {
                       {...field}
                       type="date"
                       onChange={(e) => {
-                        field.onChange(e);
+                        field.onChange(e)
                       }}
                     />
                   </>
@@ -65,7 +65,7 @@ const DateForm = ({onClose}:{onClose?:()=>void}) => {
           </Button>
         </form>
       </Form>
-    </div> 
+    </div>
   )
 }
 

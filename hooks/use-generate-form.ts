@@ -13,5 +13,6 @@ export const usegenerateForm = create<GenerateFormState>((set) => ({
   step: 1,
   setStep: (step) => set({ step }),
   examDetailForm: null,
-  setExamDetailForm: (data) => set({ examDetailForm: data ?{...data} : null}),
+  setExamDetailForm: (data) =>
+    set({ examDetailForm: data ? { ...data } : null }),
 }))

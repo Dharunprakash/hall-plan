@@ -8,6 +8,7 @@ import { Button, Select, SelectItem, Skeleton } from "@nextui-org/react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
+import { usegenerateForm } from "@/hooks/use-generate-form"
 import {
   Form,
   FormControl,
@@ -18,17 +19,16 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { trpc } from "@/app/_trpc/client"
-import { usegenerateForm } from "@/hooks/use-generate-form"
 
 export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
   const router = useRouter()
-  const {step,setStep,examDetailForm,setExamDetailForm}= usegenerateForm()
+  const { step, setStep, examDetailForm, setExamDetailForm } = usegenerateForm()
   const form = useForm<z.infer<typeof ExamDetailsType>>({
     resolver: zodResolver(ExamDetailsType),
     defaultValues: {
       name: "",
       academicYear: "",
-      semester:undefined,
+      semester: undefined,
       departmentId: "",
     },
   })
@@ -36,7 +36,7 @@ export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
   console.log(form.getValues())
   const [testType, setTestType] = useState("")
   const onSubmit = async (values: z.infer<typeof ExamDetailsType>) => {
-    setStep(step+1)
+    setStep(step + 1)
     setExamDetailForm(values)
     console.log(values)
   }
