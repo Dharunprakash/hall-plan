@@ -12,10 +12,12 @@ const page = async ({
   searchParams,
 }: {
   searchParams: {
-    departmentId: string
+    dept?: string
   }
 }) => {
-  const halls = await serverClient.hall.getAll(searchParams.departmentId)
+  const halls = await serverClient.hall.getAllMultiple(
+    searchParams.dept?.split("-")
+  )
   return (
     <div className="m-2 mx-6">
       <h1 className="mb-2 ml-2 text-2xl font-semibold">Departments</h1>

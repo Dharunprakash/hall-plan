@@ -21,6 +21,25 @@ export const hallRouter = router({
         },
       })
     }),
+  getAllMultiple: publicProcedure
+    .input(z.array(z.string()).nullish())
+    .query(
+      async ({ input: departmentCodes }): Promise<HallWithSeatsAndDept[]> => {
+        if (!departmentCodes || departmentCodes.length === 0)
+          return await db.hall.findMany({
+            include: { seats: true, department: true },
+          })
+        return await db.hall.findMany({
+          where: {
+            department: { code: { in: departmentCodes } },
+          },
+          include: {
+            seats: true,
+            department: true,
+          },
+        })
+      }
+    ),
   create: publicProcedure
     .input(HallSchema)
     .mutation(async ({ input }): Promise<HallWithSeatsAndDept> => {
