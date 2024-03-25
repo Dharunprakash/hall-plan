@@ -10,7 +10,7 @@ interface GenerateFormState {
 }
 
 export const usegenerateForm = create<GenerateFormState>((set) => ({
-  step:2,
+  step: 2,
   setStep: (step) => set({ step }),
   examDetailForm: null,
   setExamDetailForm: (data) =>

@@ -1,4 +1,5 @@
 import { StateCreator, create } from "zustand"
+
 export type DurationDetails = {
   date: string
   timings: { fn: boolean; an: boolean }
@@ -58,10 +59,10 @@ const durationDetailsStore: MyStateCreator = (set, get) => ({
     set((state) => {
       let isAn = false
       let isFn = false
-      return {
+      const res = {
         details: state.details.map((d) => {
-          isAn = isAn || d.date === date ? timings.an : d.timings.an
-          isFn = isFn || d.date === date ? timings.fn : d.timings.fn
+          isAn = isAn || (d.date === date ? timings.an : d.timings.an)
+          isFn = isFn || (d.date === date ? timings.fn : d.timings.fn)
           if (d.date === date) {
             return { ...d, timings }
           }
@@ -70,9 +71,9 @@ const durationDetailsStore: MyStateCreator = (set, get) => ({
         isAnSelected: isAn,
         isFnSelected: isFn,
       }
+      return res
     })
   },
 })
-
 
 export const useDurationDetails = create(durationDetailsStore)

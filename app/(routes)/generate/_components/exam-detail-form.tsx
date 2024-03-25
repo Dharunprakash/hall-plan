@@ -4,12 +4,12 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ExamDetailsType } from "@/schemas/generate-hall/exam-details"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {  Select, SelectItem, Skeleton } from "@nextui-org/react"
-import { Button } from "@/components/ui/button"
+import { Select, SelectItem, Skeleton } from "@nextui-org/react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
 import { usegenerateForm } from "@/hooks/use-generate-form"
+import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -158,7 +158,7 @@ export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
           {/* <DurationDetails /> */}
         </div>
         <div className="flex w-full justify-end gap-x-5">
-        <Button color="danger" onClick={onClose}>
+          <Button color="danger" onClick={onClose}>
             Close
           </Button>
           <Button type="submit" color="primary">

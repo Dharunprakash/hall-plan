@@ -25,8 +25,8 @@ const formSchema = z.object({
   date: z.string().min(1, "Date is required"),
   fn: z.string().min(1, "Time is required"),
   an: z.string().min(1, "Time is required"),
-  departments: z.array(z.string()).min(1, "Select at least one department"),
-  selectedYears: z.array(z.string()).min(1, "Select at least one year"),
+  departments: z.set(z.string()).min(1, "Select at least one department"),
+  selectedYears: z.set(z.string()).min(1, "Select at least one year"),
 })
 const DateForm = ({ onClose }: { onClose?: () => void }) => {
   const addDate = useDurationDetails((s) => s.addDate)
@@ -35,8 +35,9 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
   })
-
+  console.log(form.formState.isValid)
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values)
     // addDate(values.date)
@@ -58,7 +59,7 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 w-full"
+          className="flex w-full flex-col gap-4"
         >
           <SelectStudents control={form.control} form={form} />
           <div className="grid w-full grid-cols-2 gap-y-4">
@@ -86,7 +87,7 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
                 </FormItem>
               )}
             />
-            <div className="h-full flex flex-col justify-end ">
+            <div className="flex h-full flex-col justify-end ">
               <Button
                 type="button"
                 className="w-full md:w-[90%]"
@@ -120,8 +121,8 @@ export const Timing = ({
         date: string
         fn: string
         an: string
-        departments: string[]
-        selectedYears: string[]
+        departments: Set<string>
+        selectedYears: Set<string>
       }>
     | undefined
 }) => {

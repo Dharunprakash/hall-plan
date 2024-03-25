@@ -32,8 +32,8 @@ const SelectStudents = ({
         date: string
         fn: string
         an: string
-        departments: string[]
-        selectedYears: string[]
+        departments: Set<string>
+        selectedYears: Set<string>
       }>
     | undefined
   form: UseFormReturn<
@@ -41,8 +41,8 @@ const SelectStudents = ({
       date: string
       fn: string
       an: string
-      departments: string[]
-      selectedYears: string[]
+      departments: Set<string>
+      selectedYears: Set<string>
     },
     any,
     undefined
@@ -51,12 +51,12 @@ const SelectStudents = ({
   const { data: students } = trpc.student.getAllMinimal.useQuery()
   const { data: departments } = trpc.department.getAll.useQuery()
 
-  const [departmentIds, setDepartmentIds] = useState(new Set())
-  const [yearFilter, setYearFilter] = useState(new Set())
+  const [departmentIds, setDepartmentIds] = useState(new Set<string>())
+  const [yearFilter, setYearFilter] = useState(new Set<string>())
   const [count, setCount] = useState(0)
 
   const filteredStudents = React.useMemo(() => {
-    if (!students) {
+    if (!students || departmentIds.size === 0 || yearFilter.size === 0) {
       setCount(0)
       return []
     }
@@ -96,7 +96,6 @@ const SelectStudents = ({
             name="departments"
             render={({ field }) => (
               <FormItem className="">
-                <FormLabel>Departments</FormLabel>
                 <FormControl>
                   <Dropdown>
                     <DropdownTrigger>
@@ -114,7 +113,8 @@ const SelectStudents = ({
                       closeOnSelect={false}
                       disallowEmptySelection
                       selectionMode="multiple"
-                      selectedKeys={Array.from(field.value)} // Use field.value for selectedKeys
+                      //@ts-ignore
+                      selectedKeys={field.value} // Use field.value for selectedKeys
                       onSelectionChange={(selectedKeys) => {
                         field.onChange(selectedKeys) // Update form field value
                         handleDepartmentChange(selectedKeys) // Call your custom handler
@@ -141,7 +141,6 @@ const SelectStudents = ({
           name="selectedYears"
           render={({ field }) => (
             <FormItem className="">
-              <FormLabel>Years</FormLabel>
               <FormControl>
                 <Dropdown>
                   <DropdownTrigger className="hidden sm:flex">
@@ -157,7 +156,8 @@ const SelectStudents = ({
                     disallowEmptySelection
                     aria-label="Table Columns"
                     closeOnSelect={false}
-                    selectedKeys={Array.from(field.value)} // Use field.value for selectedKeys
+                    //@ts-ignore
+                    selectedKeys={yearFilter} // Use field.value for selectedKeys
                     selectionMode="multiple"
                     onSelectionChange={(selectedKeys) => {
                       field.onChange(selectedKeys) // Update form field value

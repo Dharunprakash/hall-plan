@@ -7,7 +7,7 @@ const page = () => {
   return (
     <div>
       <SelectHallType />
-      <SelectStudents />
+      {/* <SelectStudents /> */}
     </div>
   )
 }
