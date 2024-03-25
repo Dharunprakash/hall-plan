@@ -8,11 +8,13 @@ import { generateSeatMatrix } from "@/lib/hall/utils"
 import { capitalize, cn } from "@/lib/utils"
 import { useSelectHallType } from "@/hooks/use-select-hall-type"
 import DisplaySeats from "@/components/shared/display-seats"
+import { Button } from "@/components/ui/button"
 
-const SelectHallType = () => {
+const SelectHallType = ({ onClose }: { onClose?: () => void }) => {
   const setHallType = useSelectHallType((state) => state.setHallType)
 
   return (
+    <>
     <div className="grid grid-cols-3 gap-2">
       {HallArrangementTypeArr.map((type) => (
         <div
@@ -35,6 +37,15 @@ const SelectHallType = () => {
         </div>
       ))}
     </div>
+      <div className="flex w-full justify-end gap-x-5 mt-2">
+        <Button color="danger" onClick={onClose}>
+            Close
+          </Button>
+          <Button type="submit" color="primary">
+            Submit
+          </Button>
+        </div>
+    </>
   )
 }
 
@@ -47,7 +58,8 @@ const SelectedStyle = ({ type }: { type: HallArrangementType }) => {
         "absolute inset-0 z-40 rounded-lg",
         hallType === type ? "bg-green-200" : "bg-gray-300"
       )}
-    ></div>
+    >
+    </div>
   )
 }
 
