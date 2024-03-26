@@ -10,7 +10,9 @@ import {
   Select,
   useDisclosure,
 } from "@nextui-org/react"
+import { ArrowLeft } from "lucide-react"
 
+import { usegenerateForm } from "@/hooks/use-generate-form"
 import { SelectForm } from "@/app/(routes)/generate/_components/select"
 import { trpc } from "@/app/_trpc/client"
 
@@ -23,6 +25,12 @@ export default function VechicleFormModal({
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const utils = trpc.useUtils()
+  const setStep = usegenerateForm((s) => s.setStep)
+  const step = usegenerateForm((s) => s.step)
+
+  function handleOnclick() {
+    setStep(step - 1)
+  }
 
   return (
     <div className="-mt-1">
@@ -47,6 +55,12 @@ export default function VechicleFormModal({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
+                {step !== 1 && (
+                  <ArrowLeft
+                    className="cursor-pointer"
+                    onClick={handleOnclick}
+                  />
+                )}
                 <div className="text-center">
                   <div className="text-center">
                     {GenerateId ? "Edit" : "Create"} Hall

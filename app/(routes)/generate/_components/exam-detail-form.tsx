@@ -23,23 +23,32 @@ import { trpc } from "@/app/_trpc/client"
 
 export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
   const router = useRouter()
-  const { step, setStep, examDetailForm, setExamDetailForm } = usegenerateForm()
+  const step = usegenerateForm((s) => s.step)
+  const setStep = usegenerateForm((s) => s.setStep)
+  const setExamDetailForm = usegenerateForm((s) => s.setExamDetailForm)
+  const examDetailForm = usegenerateForm((s) => s.examDetailForm)
+  console.log(examDetailForm)
   const form = useForm<z.infer<typeof ExamDetailsType>>({
     resolver: zodResolver(ExamDetailsType),
     defaultValues: {
-      name: "",
-      academicYear: "",
-      semester: undefined,
-      departmentId: "",
+      type: examDetailForm?.type || undefined,
+      name: examDetailForm?.name || "",
+      academicYear: examDetailForm?.academicYear || "",
+      semester: examDetailForm?.semester || undefined,
+      departmentId:
+        ((examDetailForm?.type === "INTERNAL" ||
+          examDetailForm?.type === "MODEL_PRACTICAL") &&
+          examDetailForm?.departmentId) ||
+        "",
     },
   })
+
   console.log(form.formState.isValid)
   console.log(form.getValues())
   const [testType, setTestType] = useState("")
   const onSubmit = async (values: z.infer<typeof ExamDetailsType>) => {
     setStep(step + 1)
     setExamDetailForm(values)
-    console.log(values)
   }
   const { data: departments } = trpc.department.getAll.useQuery()
   return (
@@ -55,6 +64,8 @@ export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
                 <Select
                   className="text-muted-foreground !bg-white"
                   placeholder="Select the test type"
+                  defaultSelectedKeys={field.value ? [field.value] : undefined}
+                  {...field}
                   onChange={(e) => {
                     setTestType(e.target.value)
                     field.onChange(e)
@@ -113,22 +124,35 @@ export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
           <FormField
             control={form.control}
             name="semester"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Semester</FormLabel>
-                <Select {...field} placeholder="Select Semester">
-                  <SelectItem key={"ODD"} value={"ODD"}>
-                    ODD
-                  </SelectItem>
-                  <SelectItem key={"EVEN"} value={"EVEN"}>
-                    EVEN
-                  </SelectItem>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              console.log(field.value)
+              return (
+                <FormItem>
+                  <FormLabel>Semester</FormLabel>
+                  <Select
+                    {...field}
+                    value={field.value}
+                    defaultSelectedKeys={
+                      field.value ? [field.value] : undefined
+                    }
+                    placeholder="Select Semester"
+                  >
+                    <SelectItem key={"ODD"} value={"ODD"}>
+                      ODD
+                    </SelectItem>
+                    <SelectItem key={"EVEN"} value={"EVEN"}>
+                      EVEN
+                    </SelectItem>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )
+            }}
           />
-          {(testType === "INTERNAL" || testType === "MODEL_PRACTICAL") && (
+          {(testType === "INTERNAL" ||
+            testType === "MODEL_PRACTICAL" ||
+            examDetailForm?.type === "INTERNAL" ||
+            examDetailForm?.type === "MODEL_PRACTICAL") && (
             <FormField
               control={form.control}
               name="departmentId"
@@ -139,11 +163,14 @@ export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
                     <Select
                       placeholder="Select Department"
                       onChange={field.onChange}
+                      defaultSelectedKeys={
+                        field.value ? [field.value] : undefined
+                      }
                     >
                       {departments?.map((department) => (
                         <SelectItem
-                          key={department.id}
-                          value={department.id.toString()}
+                          key={department.code}
+                          value={department.code}
                         >
                           {department.code}
                         </SelectItem>

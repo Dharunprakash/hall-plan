@@ -41,9 +41,12 @@ export const studentRouter = router({
   }),
   getAllMinimal: publicProcedure.query(async () => {
     return await db.student.findMany({
-      select: {
-        departmentId: true,
-        year: true,
+      include: {
+        department: {
+          select: {
+            code: true,
+          },
+        },
       },
     })
   }),

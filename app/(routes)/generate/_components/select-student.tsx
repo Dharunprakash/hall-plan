@@ -6,12 +6,15 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Select,
+  SelectItem,
   Selection,
 } from "@nextui-org/react"
 import { ChevronDownIcon } from "lucide-react"
 import { Control, UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 
+import { usegenerateForm } from "@/hooks/use-generate-form"
 import {
   Form,
   FormControl,
@@ -35,8 +38,16 @@ const SelectStudents = ({
   const { data: students } = trpc.student.getAllMinimal.useQuery()
   const { data: departments } = trpc.department.getAll.useQuery()
 
-  const [departmentIds, setDepartmentIds] = useState(new Set<string>())
-  const [yearFilter, setYearFilter] = useState(new Set<string>())
+  const timingDetails = usegenerateForm((s) => s.timingDetails)
+  console.log(timingDetails?.departments)
+  console.log(timingDetails?.selectedYears)
+
+  const [departmentIds, setDepartmentIds] = useState(
+    new Set<string>(timingDetails?.departments)
+  )
+  const [yearFilter, setYearFilter] = useState(
+    new Set<string>(timingDetails?.selectedYears)
+  )
   const [count, setCount] = useState(0)
 
   const filteredStudents = React.useMemo(() => {
@@ -45,7 +56,10 @@ const SelectStudents = ({
       return []
     }
     const res = students.filter((student) => {
-      if (departmentIds.size > 0 && !departmentIds.has(student.departmentId)) {
+      if (
+        departmentIds.size > 0 &&
+        !departmentIds.has(student.department.code)
+      ) {
         return false
       }
       if (yearFilter.size > 0 && !yearFilter.has(student.year.toString())) {
@@ -71,98 +85,80 @@ const SelectStudents = ({
       <div className="flex justify-end">
         <h2>student Count: {count}</h2>
       </div>
-      <div className="flex items-center gap-2">
-        {!departments ? (
-          <Skeleton className="h-8 w-32" />
-        ) : (
-          <FormField
-            control={form.control}
-            name="departments"
-            render={({ field }) => (
-              <FormItem className="">
-                <FormControl>
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button
-                        size="sm"
-                        variant="flat"
-                        endContent={<ChevronDownIcon className="text-small" />}
-                      >
-                        Dept
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                      aria-label="Multiple selection example"
-                      variant="flat"
-                      closeOnSelect={false}
-                      disallowEmptySelection
+      <div className="grid grid-cols-2">
+        <div className="flex w-full max-w-xs flex-col gap-2">
+          {!departments ? (
+            <Skeleton className="h-8 w-32" />
+          ) : (
+            <FormField
+              control={form.control}
+              name="departments"
+              render={({ field }) => (
+                <FormItem className="">
+                  <FormControl>
+                    <Select
+                      // label="Department"
                       selectionMode="multiple"
-                      //@ts-ignore
+                      placeholder="Select departments"
                       selectedKeys={field.value} // Use field.value for selectedKeys
+                      className="max-w-xs"
+                      //@ts-ignore
                       onSelectionChange={(selectedKeys) => {
                         field.onChange(selectedKeys) // Update form field value
                         handleDepartmentChange(selectedKeys) // Call your custom handler
                       }}
                     >
                       {departments.map((department) => (
-                        <DropdownItem
-                          key={department.id}
+                        <SelectItem
+                          key={department.code}
+                          value={department.code}
                           className="capitalize"
                         >
-                          {department.name}
-                        </DropdownItem>
+                          {department.code}
+                        </SelectItem>
                       ))}
-                    </DropdownMenu>
-                  </Dropdown>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
-        <FormField
-          control={form.control}
-          name="selectedYears"
-          render={({ field }) => (
-            <FormItem className="">
-              <FormControl>
-                <Dropdown>
-                  <DropdownTrigger className="hidden sm:flex">
-                    <Button
-                      endContent={<ChevronDownIcon className="text-small" />}
-                      size="sm"
-                      variant="flat"
-                    >
-                      Year
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    disallowEmptySelection
-                    aria-label="Table Columns"
-                    closeOnSelect={false}
-                    //@ts-ignore
-                    selectedKeys={yearFilter} // Use field.value for selectedKeys
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+        </div>
+        <div className="flex w-full max-w-xs flex-col gap-2">
+          <FormField
+            control={form.control}
+            name="selectedYears"
+            render={({ field }) => (
+              <FormItem className="">
+                <FormControl>
+                  <Select
+                    // label="Year"
                     selectionMode="multiple"
+                    placeholder="Select years"
+                    selectedKeys={field.value}
+                    className="hidden max-w-xs sm:flex"
                     onSelectionChange={(selectedKeys) => {
                       field.onChange(selectedKeys) // Update form field value
                       handleYearChange(selectedKeys) // Call your custom handler
                     }}
                   >
                     {years.map((status) => (
-                      <DropdownItem
+                      <SelectItem
                         key={status.uid.toString()}
+                        value={status.uid.toString()}
                         className="capitalize"
                       >
                         {status.name}
-                      </DropdownItem>
+                      </SelectItem>
                     ))}
-                  </DropdownMenu>
-                </Dropdown>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
     </div>
   )

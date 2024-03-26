@@ -7,19 +7,6 @@ export const ExamDetailsSchema = z.object({
   semester: z.enum(["ODD", "EVEN"]),
 })
 
-type ExamDetailsType = {
-  name: string
-  academicYear: string
-  semester: "ODD" | "EVEN"
-} & (
-  | {
-      type: "INTERNAL" | "MODEL_PRACTICAL"
-      departmentId: string
-    }
-  | {
-      type: "PRACTICAL" | "THEORY"
-    }
-)
 // to zod
 
 // if type==internal or model examschema will add the departmentid
@@ -27,7 +14,7 @@ type ExamDetailsType = {
 export const InternalExamDetailsSchema = z
   .object({
     type: z.enum(["INTERNAL", "MODEL_PRACTICAL"]),
-    departmentId: z.string().min(12, { message: "Department is required" }),
+    departmentId: z.string().min(1, { message: "Department is required" }),
   })
   .merge(ExamDetailsSchema)
 

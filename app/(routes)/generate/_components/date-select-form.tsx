@@ -23,11 +23,26 @@ import SelectStudents from "./select-student"
 const DateForm = ({ onClose }: { onClose?: () => void }) => {
   const addDate = useDurationDetails((s) => s.addDate)
   const setStep = usegenerateForm((s) => s.setStep)
+  const timingDetails = usegenerateForm((s) => s.timingDetails)
+  const setTimingDetails = usegenerateForm((s) => s.setTimingDetails)
   const step = usegenerateForm((s) => s.step)
-
+  console.log(timingDetails)
   const form = useForm<z.infer<typeof TimingDetailsType>>({
     resolver: zodResolver(TimingDetailsType),
     mode: "onChange",
+    defaultValues: {
+      an:
+        ((timingDetails?.type === "an" || timingDetails?.type === "both") &&
+          timingDetails?.an) ||
+        "",
+      fn:
+        ((timingDetails?.type === "fn" || timingDetails?.type === "both") &&
+          timingDetails?.fn) ||
+        "",
+      departments: timingDetails?.departments || [],
+      selectedYears: timingDetails?.selectedYears || [],
+      date: timingDetails?.date || "",
+    },
   })
   console.log(form.formState.isValid)
   console.log(form.formState.errors)
@@ -35,6 +50,7 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
   function onSubmit(values: z.infer<typeof TimingDetailsType>) {
     console.log(values)
     setStep(step + 1)
+    setTimingDetails(values)
   }
   async function handleAddDate() {
     const dateValue = form.getValues().date
