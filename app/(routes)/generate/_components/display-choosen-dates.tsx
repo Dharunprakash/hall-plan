@@ -31,7 +31,6 @@ const DisplayChosenDates = () => {
                 id="fn"
                 checked={timings.fn}
                 onCheckedChange={(checked) => {
-                  console.log(checked)
                   setTimingsForDate(date, { ...timings, fn: !!checked })
                 }}
               />

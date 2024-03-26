@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { TimingDetailsType } from "@/schemas/generate-hall/timing-details"
 import {
   Button,
   Dropdown,
@@ -9,6 +10,7 @@ import {
 } from "@nextui-org/react"
 import { ChevronDownIcon } from "lucide-react"
 import { Control, UseFormReturn } from "react-hook-form"
+import { z } from "zod"
 
 import {
   Form,
@@ -27,26 +29,8 @@ const SelectStudents = ({
   control,
   form,
 }: {
-  control:
-    | Control<{
-        date: string
-        fn: string
-        an: string
-        departments: Set<string>
-        selectedYears: Set<string>
-      }>
-    | undefined
-  form: UseFormReturn<
-    {
-      date: string
-      fn: string
-      an: string
-      departments: Set<string>
-      selectedYears: Set<string>
-    },
-    any,
-    undefined
-  >
+  control: Control<z.infer<typeof TimingDetailsType>> | undefined
+  form: UseFormReturn<z.infer<typeof TimingDetailsType>>
 }) => {
   const { data: students } = trpc.student.getAllMinimal.useQuery()
   const { data: departments } = trpc.department.getAll.useQuery()

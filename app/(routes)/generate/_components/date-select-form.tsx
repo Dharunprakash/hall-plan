@@ -1,5 +1,7 @@
+import { useEffect } from "react"
+import { TimingDetailsType } from "@/schemas/generate-hall/timing-details"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Control, useForm } from "react-hook-form"
+import { Control, UseFormSetValue, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { useDurationDetails } from "@/hooks/use-duration-details"
@@ -18,29 +20,20 @@ import { Input } from "@/components/ui/input"
 import DisplayChosenDates from "./display-choosen-dates"
 import SelectStudents from "./select-student"
 
-const formSchema = z.object({
-  // date: z.string().min(1, "Date is required"),
-  // fn: z.string().min(1, "Time is required"),
-  // an: z.string().min(1, "Time is required"),
-  date: z.string().min(1, "Date is required"),
-  fn: z.string().min(1, "Time is required"),
-  an: z.string().min(1, "Time is required"),
-  departments: z.set(z.string()).min(1, "Select at least one department"),
-  selectedYears: z.set(z.string()).min(1, "Select at least one year"),
-})
 const DateForm = ({ onClose }: { onClose?: () => void }) => {
   const addDate = useDurationDetails((s) => s.addDate)
   const setStep = usegenerateForm((s) => s.setStep)
   const step = usegenerateForm((s) => s.step)
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof TimingDetailsType>>({
+    resolver: zodResolver(TimingDetailsType),
     mode: "onChange",
   })
   console.log(form.formState.isValid)
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  console.log(form.formState.errors)
+  console.log(form.getValues())
+  function onSubmit(values: z.infer<typeof TimingDetailsType>) {
     console.log(values)
-    // addDate(values.date)
     setStep(step + 1)
   }
   async function handleAddDate() {
@@ -49,7 +42,6 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
       const isValid = await form.trigger("date") // Await the result of the validation
       if (isValid) {
         addDate(dateValue)
-        form.setValue("date", "")
       }
     }
   }
@@ -63,7 +55,7 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
         >
           <SelectStudents control={form.control} form={form} />
           <div className="grid w-full grid-cols-2 gap-y-4">
-            <Timing control={form.control} />
+            <Timing control={form.control} setValue={form.setValue} />
             <FormField
               control={form.control}
               name="date"
@@ -115,19 +107,25 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
 
 export const Timing = ({
   control,
+  setValue,
 }: {
-  control:
-    | Control<{
-        date: string
-        fn: string
-        an: string
-        departments: Set<string>
-        selectedYears: Set<string>
-      }>
-    | undefined
+  control: Control<z.infer<typeof TimingDetailsType>> | undefined
+  setValue: UseFormSetValue<z.infer<typeof TimingDetailsType>>
 }) => {
   const isAnSelected = useDurationDetails((s) => s.isAnSelected)
   const isFnSelected = useDurationDetails((s) => s.isFnSelected)
+  useEffect(() => {
+    if (isAnSelected && isFnSelected) {
+      setValue("type", "both")
+    } else if (isFnSelected) {
+      setValue("type", "fn")
+    } else if (isAnSelected) {
+      setValue("type", "an")
+    } else {
+      setValue("type", "fn")
+    }
+  }, [isAnSelected, isFnSelected, setValue])
+
   if (isAnSelected && isFnSelected)
     return (
       <>
