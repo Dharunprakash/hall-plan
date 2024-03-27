@@ -1,15 +1,6 @@
 import React, { useState } from "react"
 import { TimingDetailsType } from "@/schemas/generate-hall/timing-details"
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Select,
-  SelectItem,
-  Selection,
-} from "@nextui-org/react"
+import { Select, SelectItem, Selection } from "@nextui-org/react"
 import { ChevronDownIcon } from "lucide-react"
 import { Control, UseFormReturn } from "react-hook-form"
 import { z } from "zod"
@@ -111,7 +102,6 @@ const SelectStudents = ({
                       {departments.map((department) => (
                         <SelectItem
                           key={department.code}
-                          value={department.code}
                           className="capitalize"
                         >
                           {department.code}

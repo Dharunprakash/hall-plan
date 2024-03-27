@@ -6,12 +6,19 @@ import { CheckSquare2 } from "lucide-react"
 import { HallArrangementTypeArr } from "@/types/enums"
 import { generateSeatMatrix } from "@/lib/hall/utils"
 import { capitalize, cn } from "@/lib/utils"
+import { usegenerateForm } from "@/hooks/use-generate-form"
 import { useSelectHallType } from "@/hooks/use-select-hall-type"
 import { Button } from "@/components/ui/button"
 import DisplaySeats from "@/components/shared/display-seats"
 
 const SelectHallType = ({ onClose }: { onClose?: () => void }) => {
   const setHallType = useSelectHallType((state) => state.setHallType)
+  const setStep = usegenerateForm((s) => s.setStep)
+  const step = usegenerateForm((s) => s.step)
+
+  const onSubmit = () => {
+    setStep(step + 1)
+  }
 
   return (
     <>
@@ -41,7 +48,7 @@ const SelectHallType = ({ onClose }: { onClose?: () => void }) => {
         <Button color="danger" onClick={onClose}>
           Close
         </Button>
-        <Button type="submit" color="primary">
+        <Button onClick={onSubmit} color="primary">
           Submit
         </Button>
       </div>

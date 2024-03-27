@@ -21,6 +21,38 @@ export const hallRouter = router({
         },
       })
     }),
+  getAllByDeptCode: publicProcedure
+    .input(z.array(z.string()))
+    .query(async ({ input: departmentCode }) => {
+      console.log(departmentCode)
+      // return await db.hall.findMany({ include: { seats: true, department: true } });
+      return await db.hall.findMany({
+        where: {
+          department: { code: { in: departmentCode } },
+        },
+        select: {
+          id: true,
+          hallno: true,
+          department: {
+            select: {
+              code: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: [
+          {
+            department: {
+              code: "asc",
+            },
+          },
+          {
+            hallno: "asc",
+          },
+        ],
+      })
+    }),
+
   getAllMultiple: publicProcedure
     .input(z.array(z.string()).nullish())
     .query(

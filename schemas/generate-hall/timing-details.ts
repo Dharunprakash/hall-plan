@@ -5,10 +5,9 @@ export const TimingDetailsSchema = z.object({
   departments: z
     .set(z.string())
     .min(1, { message: "Select at least one department" }),
-  selectedYears: z.set(z.string()).refine((years) => {
-    console.log(years)
-    return true
-  }),
+  selectedYears: z
+    .set(z.string())
+    .min(1, { message: "Select at least one year" }),
 })
 
 export const AnTimingSchema = z

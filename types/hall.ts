@@ -29,3 +29,11 @@ export type HallPlanExtra = {
 }
 
 export type HallPlan = HallWithSeatsWithStudentsAndDept & HallPlanExtra
+
+export type MinimalHall = {
+  id: string
+  hallno: number
+  department: {
+    code: string
+  }
+}
