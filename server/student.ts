@@ -43,6 +43,7 @@ export const studentRouter = router({
     return await db.student.findMany({
       select: {
         year: true,
+        departmentId: true,
         department: {
           select: {
             code: true,

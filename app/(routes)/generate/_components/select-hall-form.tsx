@@ -3,6 +3,7 @@ import { ExamDetailsType } from "@/schemas/generate-hall/exam-details"
 import { HallDetailsSchema } from "@/schemas/generate-hall/hall-details"
 import { GenerateHallSchema } from "@/schemas/generate-hall/input-schema"
 import { TimingDetailsType } from "@/schemas/generate-hall/timing-details"
+import { createExam } from "@/server/actions"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Select, SelectItem, Selection } from "@nextui-org/react"
 import { useForm } from "react-hook-form"
@@ -32,17 +33,17 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   const { data: halls, error } =
     trpc.hall.getAllByDeptCode.useQuery(selectedDepts)
 
-  const createExam = trpc.exam.create.useMutation({
-    onSuccess: () => {
-      onClose && onClose()
-      toast.remove()
-      toast.success("Exam created successfully")
-    },
-    onError: (error) => {
-      toast.remove()
-      toast.error(error.message)
-    },
-  })
+  // const createExam = trpc.exam.create.useMutation({
+  //   onSuccess: () => {
+  //     onClose && onClose()
+  //     toast.remove()
+  //     toast.success("Exam created successfully")
+  //   },
+  //   onError: (error) => {
+  //     toast.remove()
+  //     toast.error(error.message)
+  //   },
+  // })
 
   const setHallDetails = usegenerateForm((s) => s.setHallDetails)
   const setHalls = useSelectedHalls((s) => s.setHalls)
@@ -78,6 +79,8 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   }
 
   const onSubmit = async (data: z.infer<typeof HallDetailsSchema>) => {
+    console.log(examDetails)
+    console.log(timingDetails)
     toast.loading("Creating exam")
     console.log(data)
     setHallDetails(data)
@@ -85,10 +88,17 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
       durationDetails,
       hallType: halltype,
       ...data,
-      examDetails: examDetails as z.infer<typeof ExamDetailsType>,
-      timingDetails: timingDetails as z.infer<typeof TimingDetailsType>,
+      examDetails: examDetails!,
+      timingDetails: timingDetails!,
     }
-    await createExam.mutateAsync(fullData)
+    try {
+      await createExam(fullData)
+      toast.remove()
+      toast.success("Exam created successfully")
+    } catch (error: any) {
+      toast.remove()
+      toast.error(error.message)
+    }
   }
 
   return (

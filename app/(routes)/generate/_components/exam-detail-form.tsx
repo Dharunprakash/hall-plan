@@ -168,10 +168,7 @@ export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
                       }
                     >
                       {departments?.map((department) => (
-                        <SelectItem
-                          key={department.code}
-                          value={department.code}
-                        >
+                        <SelectItem key={department.id}>
                           {department.code}
                         </SelectItem>
                       ))}

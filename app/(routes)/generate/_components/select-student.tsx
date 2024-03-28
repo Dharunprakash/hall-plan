@@ -1,17 +1,14 @@
 import React, { useState } from "react"
 import { TimingDetailsType } from "@/schemas/generate-hall/timing-details"
-import { Select, SelectItem, Selection } from "@nextui-org/react"
-import { ChevronDownIcon } from "lucide-react"
+import { Select, SelectItem } from "@nextui-org/react"
 import { Control, UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 
 import { usegenerateForm } from "@/hooks/use-generate-form"
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -40,17 +37,14 @@ const SelectStudents = ({
     new Set<string>(timingDetails?.selectedYears)
   )
   const [count, setCount] = useState(0)
-
+  console.log(departmentIds)
   const filteredStudents = React.useMemo(() => {
     if (!students || departmentIds.size === 0 || yearFilter.size === 0) {
       setCount(0)
       return []
     }
     const res = students.filter((student) => {
-      if (
-        departmentIds.size > 0 &&
-        !departmentIds.has(student.department.code)
-      ) {
+      if (departmentIds.size > 0 && !departmentIds.has(student.departmentId)) {
         return false
       }
       if (yearFilter.size > 0 && !yearFilter.has(student.year.toString())) {
