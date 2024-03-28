@@ -137,6 +137,7 @@ model Exam {
   // ONLY FOR INTERNAL AND MODEL_PRACTICAL THE DEPARTMENT IS REQUIRED
   departmentId String?     @db.ObjectId
   department   Department? @relation(fields: [departmentId], references: [id])
+  
 
   semester     OddEven
   students     Student[]

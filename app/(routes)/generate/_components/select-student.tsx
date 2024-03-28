@@ -101,7 +101,7 @@ const SelectStudents = ({
                     >
                       {departments.map((department) => (
                         <SelectItem
-                          key={department.code}
+                          key={department.id}
                           className="capitalize"
                         >
                           {department.code}

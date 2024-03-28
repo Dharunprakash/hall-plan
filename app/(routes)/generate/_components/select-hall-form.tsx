@@ -6,7 +6,7 @@ import { Select, SelectItem, Selection } from "@nextui-org/react"
 import { ChevronDownIcon } from "lucide-react"
 import { Control, UseFormReturn, useForm } from "react-hook-form"
 import { z } from "zod"
-
+import { ExamType } from "@prisma/client"
 import { usegenerateForm } from "@/hooks/use-generate-form"
 import { useSelectHallType } from "@/hooks/use-select-hall-type"
 import { useSelectedHalls } from "@/hooks/use-selected-hall"
@@ -34,7 +34,6 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   const halltype = useSelectHallType((s) => s.hallType)
   const hallDetails = usegenerateForm((s) => s.hallDetails)
   const hallData = useSelectedHalls((s) => s.halls)
-
   console.log(hallData)
 
   console.log(hallDetails)
@@ -60,10 +59,16 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
     setHalls(halls.filter((hall) => selectedKeys.has(hall.id)))
     console.log(selectedKeys)
   }
-
+  console.log(halls)
   const onSubmit = (data: z.infer<typeof HallDetailsSchema>) => {
     console.log(data)
     setHallDetails(data)
+    const fullData ={
+      ...examDetails,
+      ...timingDetails,
+      halltype,
+      ...data,
+    }
   }
 
   return (
@@ -109,7 +114,7 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
               )}
             />
           )}
-          {!halls ? (
+          {!halls && !hallData ? (
             <Skeleton className="h-8 w-32" />
           ) : (
             <FormField
@@ -131,11 +136,17 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
                         handleHallChange(selectedKeys as Set<string>) // Call your custom handler
                       }}
                     >
-                      {halls.map((hall) => (
-                        <SelectItem key={hall.id} className="capitalize">
-                          {hall.department.code + hall.hallno}
-                        </SelectItem>
-                      ))}
+                      {halls?.length
+                        ? halls.map((hall) => (
+                            <SelectItem key={hall.id} className="capitalize">
+                              {hall.department.code + hall.hallno}
+                            </SelectItem>
+                          ))
+                        : hallData.map((hall) => (
+                            <SelectItem key={hall.id} className="capitalize">
+                              {hall.department.code + hall.hallno}
+                            </SelectItem>
+                          ))}
                     </Select>
                   </FormControl>
                   <FormMessage />
