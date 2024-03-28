@@ -1,12 +1,15 @@
-import React, { useState } from "react"
+import { useState } from "react"
+import { ExamDetailsType } from "@/schemas/generate-hall/exam-details"
 import { HallDetailsSchema } from "@/schemas/generate-hall/hall-details"
+import { GenerateHallSchema } from "@/schemas/generate-hall/input-schema"
 import { TimingDetailsType } from "@/schemas/generate-hall/timing-details"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Select, SelectItem, Selection } from "@nextui-org/react"
-import { ChevronDownIcon } from "lucide-react"
-import { Control, UseFormReturn, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { z } from "zod"
-import { ExamType } from "@prisma/client"
+
+import { useDurationDetails } from "@/hooks/use-duration-details"
 import { usegenerateForm } from "@/hooks/use-generate-form"
 import { useSelectHallType } from "@/hooks/use-select-hall-type"
 import { useSelectedHalls } from "@/hooks/use-selected-hall"
@@ -22,10 +25,24 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { trpc } from "@/app/_trpc/client"
 
-import { years } from "../../students/_components/data"
-
 const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   const [selectedDepts, setSelected] = useState<string[]>([])
+
+  const { data: departments } = trpc.department.getAll.useQuery()
+  const { data: halls, error } =
+    trpc.hall.getAllByDeptCode.useQuery(selectedDepts)
+
+  const createExam = trpc.exam.create.useMutation({
+    onSuccess: () => {
+      onClose && onClose()
+      toast.remove()
+      toast.success("Exam created successfully")
+    },
+    onError: (error) => {
+      toast.remove()
+      toast.error(error.message)
+    },
+  })
 
   const setHallDetails = usegenerateForm((s) => s.setHallDetails)
   const setHalls = useSelectedHalls((s) => s.setHalls)
@@ -34,9 +51,11 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   const halltype = useSelectHallType((s) => s.hallType)
   const hallDetails = usegenerateForm((s) => s.hallDetails)
   const hallData = useSelectedHalls((s) => s.halls)
-  console.log(hallData)
+  const durationDetails = useDurationDetails((s) => s.details)
 
+  console.log(hallData)
   console.log(hallDetails)
+  console.log(halls)
 
   const handleDepartmentChange = (selectedKeys: Selection) => {
     console.log(selectedKeys)
@@ -51,24 +70,25 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
     },
     mode: "onChange",
   })
-  const { data: departments } = trpc.department.getAll.useQuery()
-  const { data: halls, error } =
-    trpc.hall.getAllByDeptCode.useQuery(selectedDepts)
+
   const handleHallChange = (selectedKeys: Set<string>) => {
     if (!halls) return
     setHalls(halls.filter((hall) => selectedKeys.has(hall.id)))
     console.log(selectedKeys)
   }
-  console.log(halls)
-  const onSubmit = (data: z.infer<typeof HallDetailsSchema>) => {
+
+  const onSubmit = async (data: z.infer<typeof HallDetailsSchema>) => {
+    toast.loading("Creating exam")
     console.log(data)
     setHallDetails(data)
-    const fullData ={
-      ...examDetails,
-      ...timingDetails,
-      halltype,
+    const fullData: z.infer<typeof GenerateHallSchema> = {
+      durationDetails,
+      hallType: halltype,
       ...data,
+      examDetails: examDetails as z.infer<typeof ExamDetailsType>,
+      timingDetails: timingDetails as z.infer<typeof TimingDetailsType>,
     }
+    await createExam.mutateAsync(fullData)
   }
 
   return (

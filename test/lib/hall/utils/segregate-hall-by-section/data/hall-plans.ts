@@ -65,7 +65,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -106,7 +106,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -147,7 +147,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -188,7 +188,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -229,7 +229,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -270,7 +270,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -311,7 +311,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -352,7 +352,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -393,7 +393,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -434,7 +434,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -475,7 +475,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -516,7 +516,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -557,7 +557,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -598,7 +598,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -639,7 +639,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -680,7 +680,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -721,7 +721,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -762,7 +762,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -803,7 +803,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -844,7 +844,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -885,7 +885,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -926,7 +926,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -967,7 +967,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -1008,7 +1008,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -1049,7 +1049,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -1090,7 +1090,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -1131,7 +1131,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -1172,7 +1172,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -1213,7 +1213,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },
@@ -1254,7 +1254,7 @@ export const hallPlans: [string, HallPlan][] = [
 
             batch: "2021-2025",
 
-            examId: null,
+            examIds: [],
 
             departmentId: "65f4607e11746c826b3f5128",
           },

@@ -71,8 +71,8 @@ model Student {
   vertical String? @default("NONE")
   batch    String? @default("2021-2025")
 
-  examId String? @db.ObjectId
-  exam   Exam?   @relation(fields: [examId], references: [id])
+  examIds String[] @db.ObjectId
+  exams   Exam[]   @relation(fields: [examIds], references: [id])
 
   departmentId String     @db.ObjectId
   department   Department @relation(fields: [departmentId], references: [id])
@@ -137,18 +137,37 @@ model Exam {
   // ONLY FOR INTERNAL AND MODEL_PRACTICAL THE DEPARTMENT IS REQUIRED
   departmentId String?     @db.ObjectId
   department   Department? @relation(fields: [departmentId], references: [id])
-  
 
   semester     OddEven
-  students     Student[]
+  studentIds   String[]  @db.ObjectId
+  students     Student[] @relation(fields: [studentIds], references: [id])
   halls        Hall[]
   academicYear String
-  dates        DateTime[]
-  timingFn     DateTime
+  dates        Date[]
+  timingFn     DateTime?
   timingAn     DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Date {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  date   DateTime
+  fn     Timing?  @relation("fn")
+  an     Timing?  @relation("an")
+  examId String   @db.ObjectId
+  exam   Exam     @relation(fields: [examId], references: [id])
+}
+
+model Timing {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  startTime DateTime
+  endTime   DateTime
+  dateId    String   @unique @db.ObjectId
+  fnDate    Date?    @relation(fields: [dateId], references: [id], name: "fn")
+  anDate    Date?    @relation(fields: [dateId], references: [id], name: "an")
 }
 
 // The Account model is used by the NextAuth.js authentication library
