@@ -98,6 +98,30 @@ export const examRouter = router({
           })
         })
       )
+      db.exam
+        .findUnique({
+          where: {
+            id: exam.id,
+          },
+          include: {
+            halls: {
+              include: {
+                department: true,
+                seats: {
+                  include: {
+                    student: true,
+                  },
+                },
+              },
+            },
+            dates: true,
+            department: true,
+            students: true,
+          },
+        })
+        .then((res) => {
+          console.log(res)
+        })
       return exam
     }),
 })
