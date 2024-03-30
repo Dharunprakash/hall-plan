@@ -51,7 +51,7 @@ const INITIAL_VISIBLE_COLUMNS = [
 
 export default function HallHistory() {
   const utils = trpc.useUtils()
-  const { data } = trpc.student.getAll.useQuery()
+  const { data } = trpc.student.getAll.useQuery({})
   const deleteUser = trpc.student.delete.useMutation({
     onSuccess: () => {
       utils.student.getAll.invalidate()

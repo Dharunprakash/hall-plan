@@ -1,11 +1,12 @@
-import React from "react"
+import { serverClient } from "@/app/_trpc/serverClient"
 
-import StudentTable from "./_components/student-table"
+import StudentTable from "../../../components/shared/student-table"
 
-const page = () => {
+const page = async () => {
+  const data = await serverClient.student.getAll({})
   return (
     <div>
-      <StudentTable />
+      <StudentTable data={data} />
     </div>
   )
 }

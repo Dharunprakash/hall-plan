@@ -9,13 +9,18 @@ import { serverClient } from "@/app/_trpc/serverClient"
 
 const page = async ({
   searchParams,
+  params,
 }: {
   searchParams: {
     dept?: string
   }
+  params: {
+    id: string
+  }
 }) => {
   const halls = await serverClient.hall.getAllMultiple({
     departmentCodes: searchParams.dept?.split("-"),
+    examId: params.id,
   })
   return (
     <div className="m-2 mx-6">

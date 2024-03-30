@@ -1,5 +1,5 @@
 import { HallSchema } from "@/schemas/hall"
-import { Seat } from "@prisma/client"
+import { Prisma, Seat } from "@prisma/client"
 import { z } from "zod"
 
 import { HallWithSeatsAndDept } from "@/types/hall"
@@ -54,17 +54,34 @@ export const hallRouter = router({
     }),
 
   getAllMultiple: publicProcedure
-    .input(z.array(z.string()).nullish())
+    .input(
+      z.object({
+        departmentCodes: z.array(z.string()).nullish(),
+        examId: z.string().nullish(),
+      })
+    )
     .query(
-      async ({ input: departmentCodes }): Promise<HallWithSeatsAndDept[]> => {
-        if (!departmentCodes || departmentCodes.length === 0)
-          return await db.hall.findMany({
-            include: { seats: true, department: true },
-          })
-        return await db.hall.findMany({
+      async ({
+        input: { departmentCodes, examId },
+      }): Promise<HallWithSeatsAndDept[]> => {
+        const query: Prisma.HallFindManyArgs = {
           where: {
-            department: { code: { in: departmentCodes } },
+            rootHallId: null,
           },
+        }
+        if (examId) {
+          query.where = {
+            examId: examId,
+          }
+        }
+        if (!(!departmentCodes || departmentCodes.length === 0)) {
+          query.where = {
+            ...query.where,
+            department: { code: { in: departmentCodes } },
+          }
+        }
+        return await db.hall.findMany({
+          ...query,
           include: {
             seats: true,
             department: true,

@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils"
 import { trpc } from "@/app/_trpc/client"
 
-import DisplaySeats from "../../../../../components/shared/display-seats"
+import DisplaySeats from "../../shared/display-seats"
 import EditHallDimension from "./edit-hall-dimension"
 import HallMetaData from "./hall-meta-data"
 

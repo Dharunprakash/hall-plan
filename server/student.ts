@@ -1,4 +1,5 @@
 import { excelFormSchema, singleStudentSchema } from "@/schemas/student"
+import { Prisma } from "@prisma/client"
 import { z } from "zod"
 
 import { StudentWithDept } from "@/types/student"
@@ -19,26 +20,41 @@ const sortStudents = (students: StudentWithDept[]) => {
 }
 
 export const studentRouter = router({
-  getAll: publicProcedure.query(async (): Promise<StudentWithDept[]> => {
-    return sortStudents(
-      await db.student.findMany({
-        include: { department: true },
-        orderBy: [
-          {
-            department: {
-              code: "asc",
-            },
-          },
-          {
-            section: "asc",
-          },
-          {
-            rollno: "asc",
-          },
-        ],
+  getAll: publicProcedure
+    .input(
+      z.object({
+        examId: z.string().nullish(),
       })
     )
-  }),
+    .query(async ({ input }): Promise<StudentWithDept[]> => {
+      const query: Prisma.StudentFindManyArgs = {}
+      if (input.examId) {
+        query.where = {
+          examIds: {
+            has: input.examId,
+          },
+        }
+      }
+      return sortStudents(
+        await db.student.findMany({
+          ...query,
+          include: { department: true },
+          orderBy: [
+            {
+              department: {
+                code: "asc",
+              },
+            },
+            {
+              section: "asc",
+            },
+            {
+              rollno: "asc",
+            },
+          ],
+        })
+      )
+    }),
   getAllMinimal: publicProcedure.query(async () => {
     return await db.student.findMany({
       select: {

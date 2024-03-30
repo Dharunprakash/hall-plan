@@ -27,9 +27,13 @@ import { capitalize, intToRoman } from "@/lib/utils"
 import DialogModal from "@/components/modal/dialog-modal"
 import { trpc } from "@/app/_trpc/client"
 
-import { columns, departments, years } from "./data"
-import ExcelForm from "./excel-form"
-import StudentForm from "./student-form"
+import {
+  columns,
+  departments,
+  years,
+} from "../../app/(routes)/students/_components/data"
+import ExcelForm from "../../app/(routes)/students/_components/excel-form"
+import StudentForm from "../../app/(routes)/students/_components/student-form"
 
 const INITIAL_VISIBLE_COLUMNS = [
   "rollno",
@@ -42,9 +46,8 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ]
 
-export default function StudentTable() {
+export default function StudentTable({ data }: { data: StudentWithDept[] }) {
   const utils = trpc.useUtils()
-  const { data } = trpc.student.getAll.useQuery()
   const deleteUser = trpc.student.delete.useMutation({
     onSuccess: () => {
       utils.student.getAll.invalidate()
