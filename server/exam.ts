@@ -90,6 +90,9 @@ export const examRouter = router({
                 ]
               : { type: input.type ? { equals: input.type } : undefined },
         },
+        include: {
+          department: true,
+        },
         skip: input.skip,
         take: input.take,
         orderBy: {

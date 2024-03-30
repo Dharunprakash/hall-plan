@@ -1,7 +1,14 @@
 import React from "react"
+import { redirect } from "next/navigation"
 
-const page = () => {
-  return <div>page</div>
+const page = ({
+  params,
+}: {
+  params: {
+    id: string
+  }
+}) => {
+  redirect(`/generate/${params.id}/details`)
 }
 
 export default page

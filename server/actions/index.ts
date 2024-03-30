@@ -1,5 +1,6 @@
 "use server"
 
+import { redirect } from "next/navigation"
 import { GenerateHallSchema } from "@/schemas/generate-hall/input-schema"
 import { HallArrangementType, Prisma } from "@prisma/client"
 import { DefaultArgs } from "@prisma/client/runtime/library"
@@ -124,7 +125,7 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
         return db.date.create(data)
       })
     )
-
+    redirect(`/generate/${exam.id}/details`)
     // const res = await db.exam.findUnique({
     //   where: {
     //     id: exam.id,

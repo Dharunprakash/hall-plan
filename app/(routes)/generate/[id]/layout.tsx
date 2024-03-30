@@ -4,11 +4,11 @@ import TabsBar from "./_components/tabs-bar"
 
 const layout = async ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className="flex h-full w-full flex-col">
+    <main className="flex h-full max-h-full w-full flex-col gap-1 overflow-y-auto">
       <div>
         <TabsBar className="" />
       </div>
-      <div className="">{children}</div>
+      <div className="w-full">{children}</div>
     </main>
   )
 }
