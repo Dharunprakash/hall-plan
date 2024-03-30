@@ -38,6 +38,7 @@ const SelectStudents = ({
   )
   const [count, setCount] = useState(0)
   console.log(departmentIds)
+  console.log(yearFilter)
   const filteredStudents = React.useMemo(() => {
     if (!students || departmentIds.size === 0 || yearFilter.size === 0) {
       setCount(0)
@@ -47,7 +48,7 @@ const SelectStudents = ({
       if (departmentIds.size > 0 && !departmentIds.has(student.departmentId)) {
         return false
       }
-      if (yearFilter.size > 0 && !yearFilter.has(student.year.toString())) {
+      if (yearFilter.size > 0 && !yearFilter.has(student.year.toString()) ){
         return false
       }
       return true
@@ -126,8 +127,7 @@ const SelectStudents = ({
                   >
                     {years.map((status) => (
                       <SelectItem
-                        key={status.uid.toString()}
-                        value={status.uid.toString()}
+                        key={status.uid}
                         className="capitalize"
                       >
                         {status.name}

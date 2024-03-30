@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label"
 
 const DisplayChosenDates = () => {
   const { removeDate, details, setTimingsForDate } = useDurationDetails()
+  
+  console.log(details)
   return (
     <div className="flex max-w-3xl flex-wrap">
       {details.map(({ date, timings }) => (

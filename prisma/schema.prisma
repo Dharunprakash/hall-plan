@@ -144,8 +144,8 @@ model Exam {
   halls        Hall[]
   academicYear String
   dates        Date[]
-  timingFn     DateTime?
-  timingAn     DateTime?
+  timingFn     String?
+  timingAn     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -162,9 +162,7 @@ model Date {
 
 model Timing {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  startTime DateTime
-  endTime   DateTime
+  time      String
   dateId    String   @unique @db.ObjectId
   fnDate    Date?    @relation(fields: [dateId], references: [id], name: "fn")
   anDate    Date?    @relation(fields: [dateId], references: [id], name: "an")
