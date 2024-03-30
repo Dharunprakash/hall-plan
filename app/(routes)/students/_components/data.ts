@@ -12,10 +12,10 @@ export const columns = [
 ]
 
 export const years = [
-  { name: "I", uid: "1" },
-  { name: "II", uid: "2" },
-  { name: "III", uid: "3" },
-  { name: "IV", uid: "4" },
+  { name: "I", uid: 1 },
+  { name: "II", uid: 2 },
+  { name: "III", uid: 3 },
+  { name: "IV", uid: 4},
 ]
 
 export const departments = [

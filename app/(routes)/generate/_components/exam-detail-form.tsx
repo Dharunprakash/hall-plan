@@ -115,6 +115,7 @@ export const ExamDetailForm = ({ onClose }: { onClose?: () => void }) => {
                   <Input
                     placeholder="2023-2024"
                     {...field} // Spread field props
+                    onChange={(e) => field.onChange(e)}
                   />
                 </FormControl>
                 <FormMessage />

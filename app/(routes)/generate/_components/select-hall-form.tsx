@@ -53,6 +53,7 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   const hallDetails = usegenerateForm((s) => s.hallDetails)
   const hallData = useSelectedHalls((s) => s.halls)
   const durationDetails = useDurationDetails((s) => s.details)
+  const setStep = usegenerateForm((s) => s.setStep)
 
   console.log(hallData)
   console.log(hallDetails)
@@ -95,6 +96,8 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
       await createExam(fullData)
       toast.remove()
       toast.success("Exam created successfully")
+      setStep(1)
+      
     } catch (error: any) {
       toast.remove()
       toast.error(error.message)
