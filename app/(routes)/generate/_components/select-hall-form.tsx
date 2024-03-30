@@ -97,7 +97,6 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
       toast.remove()
       toast.success("Exam created successfully")
       setStep(1)
-      
     } catch (error: any) {
       toast.remove()
       toast.error(error.message)

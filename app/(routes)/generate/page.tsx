@@ -1,12 +1,34 @@
-import React from "react"
+import { PlusIcon } from "lucide-react"
 
-import GeneratePlan from "./_components/generate-plan"
+import GenerateDialogModal from "@/components/modal/generate-dialog-modal"
+import { serverClient } from "@/app/_trpc/serverClient"
 
-const page = () => {
+import ExamCard from "./_components/exam-card"
+import ExamPagination from "./_components/exam-pagination"
+import Filters from "./_components/filter"
+
+const page = async ({
+  searchParams,
+}: {
+  searchParams: {
+    page?: number
+    type?: string
+    startDate?: string
+    endDate?: string
+  }
+}) => {
+  const exams = await serverClient.exam.getAll({})
   return (
-    <div>
-      <GeneratePlan />
-    </div>
+    <main className="h-full w-full">
+      <section className="flex justify-between">
+        <Filters />
+        <GenerateDialogModal Icon={PlusIcon} />
+      </section>
+      {exams.map((exam) => (
+        <ExamCard key={exam.id} exam={exam} />
+      ))}
+      <ExamPagination />
+    </main>
   )
 }
 

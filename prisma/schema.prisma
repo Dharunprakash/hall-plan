@@ -98,8 +98,8 @@ model Hall {
   hallHistory Hall[]  @relation("hallHistory")
 
   departmentId String     @db.ObjectId
-  department   Department @relation(fields: [departmentId], references: [id])
-  Exam         Exam?      @relation(fields: [examId], references: [id])
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  Exam         Exam?      @relation(fields: [examId], references: [id], onDelete: Cascade)
   examId       String?    @db.ObjectId
 }
 
@@ -157,15 +157,16 @@ model Date {
   fn     Timing?  @relation("fn")
   an     Timing?  @relation("an")
   examId String   @db.ObjectId
-  exam   Exam     @relation(fields: [examId], references: [id])
+  exam   Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
 }
 
 model Timing {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  time      String
-  dateId    String   @unique @db.ObjectId
-  fnDate    Date?    @relation(fields: [dateId], references: [id], name: "fn")
-  anDate    Date?    @relation(fields: [dateId], references: [id], name: "an")
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  time     String
+  fnDateId String? @unique @db.ObjectId
+  anDateId String? @unique @db.ObjectId
+  fnDate   Date?   @relation(fields: [fnDateId], references: [id], name: "fn", onDelete: Cascade)
+  anDate   Date?   @relation(fields: [anDateId], references: [id], name: "an", onDelete: Cascade)
 }
 
 // The Account model is used by the NextAuth.js authentication library

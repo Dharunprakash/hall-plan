@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import TRPCProvider from "./_trpc/Provider"
 import "./globals.css"
 import { auth } from "@/auth"
+import { clearAllExamIds } from "@/scripts/students"
 import { SessionProvider } from "next-auth/react"
 
 import { ToastProvider } from "@/components/provider/toaster-provider"
@@ -25,6 +26,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const session = await auth()
+  // await clearAllExamIds()
   return (
     <SessionProvider session={session}>
       <TRPCProvider>

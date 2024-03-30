@@ -1,5 +1,5 @@
 import { GenerateHallSchema } from "@/schemas/generate-hall/input-schema"
-import { HallArrangementType } from "@prisma/client"
+import { ExamType, HallArrangementType } from "@prisma/client"
 import { z } from "zod"
 
 import { ExamDetails } from "@/types/exam"
@@ -32,96 +32,73 @@ export const examRouter = router({
       })
       return res
     }),
-  create: publicProcedure
-    .input(GenerateHallSchema)
-    .mutation(async ({ input }) => {
-      const {
-        examDetails,
-        timingDetails,
-        hallType,
-        durationDetails,
-        ...hallDetails
-      } = input
-      const exam = await db.exam.create({
-        data: {
-          academicYear: examDetails.academicYear,
-          name: examDetails.name,
-          semester: examDetails.semester,
-          departmentId:
-            examDetails.type === "INTERNAL" ||
-            examDetails.type === "MODEL_PRACTICAL"
-              ? examDetails.departmentId
-              : null,
-          timingAn: timingDetails.type !== "fn" ? timingDetails.an : null,
-          timingFn: timingDetails.type !== "an" ? timingDetails.fn : null,
-          type: examDetails.type,
+  delete: publicProcedure.input(z.string()).query(async ({ input: id }) => {
+    const studentIds = await db.student.findMany({
+      where: {
+        examIds: {
+          has: id,
         },
+      },
+      select: {
+        id: true,
+      },
+    })
+    await db.exam.update({
+      where: {
+        id,
+      },
+      data: {
+        students: {
+          disconnect: studentIds,
+        },
+      },
+    })
+    return await db.exam.delete({
+      where: {
+        id,
+      },
+    })
+  }),
+  // get All exams pagination
+  getAll: publicProcedure
+    .input(
+      z.object({
+        skip: z.number().default(0),
+        take: z.number().default(10),
+        type: z.nativeEnum(ExamType).nullish(),
+        startDate: z.string().nullish(),
+        endDate: z.string().nullish(),
       })
-      db.student.updateMany({
+    )
+    .query(async ({ input }) => {
+      const res = await db.exam.findMany({
         where: {
-          departmentId: {
-            in: Array.from(hallDetails.departments),
-          },
-        },
-        data: {
-          examIds: {
-            push: exam.id,
-          },
-        },
-      })
-      const halls = await db.hall.findMany({
-        where: {
-          id: {
-            in: Array.from(hallDetails.selectedHalls),
-          },
-        },
-        include: {
-          department: true,
-          seats: true,
-        },
-      })
-      const newHallsThatAreCopyOfItsParent = await Promise.all(
-        halls.map(({ type, id, department, ...hall }) => {
-          return db.hall.create({
-            data: {
-              ...hall,
-              rootHallId: id,
-              departmentId: hall.departmentId,
-              examId: exam.id,
-              type: hallType as HallArrangementType,
-              seats: {
-                createMany: {
-                  data: hall.seats.map(({ id, ...seat }) => ({ ...seat })),
-                },
-              },
-            },
-          })
-        })
-      )
-      db.exam
-        .findUnique({
-          where: {
-            id: exam.id,
-          },
-          include: {
-            halls: {
-              include: {
-                department: true,
-                seats: {
-                  include: {
-                    student: true,
+          AND:
+            input.startDate && input.endDate
+              ? [
+                  {
+                    updatedAt: {
+                      gte: new Date(input.startDate),
+                    },
                   },
-                },
-              },
-            },
-            dates: true,
-            department: true,
-            students: true,
-          },
-        })
-        .then((res) => {
-          console.log(res)
-        })
-      return exam
+                  {
+                    updatedAt: {
+                      lte: new Date(input.endDate),
+                    },
+                  },
+                  { type: input.type ? { equals: input.type } : undefined },
+                ]
+              : { type: input.type ? { equals: input.type } : undefined },
+        },
+        skip: input.skip,
+        take: input.take,
+        orderBy: {
+          updatedAt: "desc",
+        },
+      })
+      return res
     }),
+  getExamsCount: publicProcedure.input(z.string()).query(async () => {
+    return await db.exam.count()
+  }),
 })

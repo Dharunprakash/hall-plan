@@ -1,13 +1,10 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
 import {
   Modal,
   ModalBody,
   ModalContent,
-  ModalFooter,
   ModalHeader,
-  Select,
   useDisclosure,
 } from "@nextui-org/react"
 import { ArrowLeft } from "lucide-react"
@@ -16,7 +13,7 @@ import { usegenerateForm } from "@/hooks/use-generate-form"
 import { SelectForm } from "@/app/(routes)/generate/_components/select"
 import { trpc } from "@/app/_trpc/client"
 
-export default function VechicleFormModal({
+export default function GenerateDialogModal({
   GenerateId,
   Icon,
 }: {
