@@ -1,5 +1,4 @@
-import { GenerateHallSchema } from "@/schemas/generate-hall/input-schema"
-import { ExamType, HallArrangementType } from "@prisma/client"
+import { ExamType } from "@prisma/client"
 import { z } from "zod"
 
 import { ExamDetails } from "@/types/exam"

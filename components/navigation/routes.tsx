@@ -17,7 +17,7 @@ const Routes = () => {
           key={index}
           className={cn(
             "rounded-2xl p-1 px-2 transition hover:bg-slate-200",
-            pathname === route.path && "bg-slate-100"
+            pathname.includes(route.path) && "bg-slate-100"
           )}
         >
           {route.name}

@@ -66,12 +66,17 @@ export const hallRouter = router({
       }): Promise<HallWithSeatsAndDept[]> => {
         const query: Prisma.HallFindManyArgs = {
           where: {
-            rootHallId: null,
+            rootHall: {
+              is: null,
+            },
           },
         }
         if (examId) {
           query.where = {
             examId: examId,
+            rootHallId: {
+              not: null,
+            },
           }
         }
         if (!(!departmentCodes || departmentCodes.length === 0)) {
@@ -80,6 +85,8 @@ export const hallRouter = router({
             department: { code: { in: departmentCodes } },
           }
         }
+        console.log(query)
+        console.log(examId)
         return await db.hall.findMany({
           ...query,
           include: {

@@ -21,6 +21,12 @@ export const checkSameHallNoExists = async (
   }))
 }
 export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
+  const validatedFields = GenerateHallSchema.safeParse(input)
+
+  if (!validatedFields.success) {
+    return { error: "Invalid fields!" }
+  }
+
   const {
     examDetails,
     timingDetails,
