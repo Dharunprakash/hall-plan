@@ -97,7 +97,7 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
             type: hallType as HallArrangementType,
             seats: {
               createMany: {
-                data: hall.seats.map(({ id, hallId, ...seat }) => ({
+                data: hall.seats.map(({ id, hallId, studentId, ...seat }) => ({
                   ...seat,
                 })),
               },

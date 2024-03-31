@@ -12,30 +12,39 @@ const TabsBar = ({ className }: { className?: string }) => {
   const routes = [
     {
       name: "Details",
+      route: "/details",
       path: `/generate/${params.id}/details`,
     },
     {
       name: "Halls",
+      route: "/halls",
       path: `/generate/${params.id}/halls`,
     },
     {
       name: "Students",
+      route: "/students",
       path: `/generate/${params.id}/students`,
     },
-    // {
-    //   name: 'Plan',
-    //   path: 'generate/output',
-    // },
+    {
+      name: "Plan",
+      route: "/output",
+      path: `/generate/${params.id}/output/hall-plan`,
+    },
   ]
   return (
-    <div className="flex w-full justify-evenly gap-3 rounded-md bg-gray-600 p-[0.2rem] pb-[0.25rem]">
+    <div
+      className={cn(
+        "bg-muted text-muted-foreground grid h-10 w-full grid-cols-4 items-center justify-center gap-x-1 rounded-md p-1",
+        className
+      )}
+    >
       {routes.map((route) => (
         <Link
           key={route.path}
           href={route.path}
           className={cn(
-            " w-full rounded-md py-[0.6rem] text-center text-white transition-all hover:bg-gray-700",
-            pathname.includes(route.path) && "bg-purple-900"
+            "ring-offset-background focus-visible:ring-ring data-[state=active]:bg-background data-[state=active]:text-foreground inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm",
+            pathname.includes(route.route) && "bg-black text-white"
           )}
         >
           {route.name}

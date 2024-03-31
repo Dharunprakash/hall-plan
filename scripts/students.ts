@@ -9,3 +9,11 @@ export const clearAllExamIds = async () => {
     },
   })
 }
+
+export const clearAllSeats = async () => {
+  await db.seat.updateMany({
+    data: {
+      studentId: null,
+    },
+  })
+}
