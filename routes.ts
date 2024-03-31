@@ -8,6 +8,8 @@ export const publicRoutes = [
   "/auth/new-verification",
   "/api/trpc/test",
   "/api/uploadthing",
+  "/api/trpc/exam/preview",
+  "/preview",
 ]
 
 /**

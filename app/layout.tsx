@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import { auth } from "@/auth"
+import { SessionProvider } from "next-auth/react"
 
 import TRPCProvider from "./_trpc/Provider"
 import "./globals.css"
-import { auth } from "@/auth"
-import { clearAllExamIds } from "@/scripts/students"
-import { SessionProvider } from "next-auth/react"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import { ToastProvider } from "@/components/provider/toaster-provider"
 
@@ -33,6 +33,7 @@ export default async function RootLayout({
         <html lang="en">
           <body className={inter.className}>
             <ToastProvider />
+            <ReactQueryDevtools />
             <main className="h-full w-full">{children}</main>
           </body>
         </html>

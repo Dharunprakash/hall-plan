@@ -1,7 +1,7 @@
 import { ExamType } from "@prisma/client"
 import { z } from "zod"
 
-import { ExamDetails } from "@/types/exam"
+import { ExamDetails, ExamDetailsWithDate } from "@/types/exam"
 import { db } from "@/lib/db"
 
 import { publicProcedure, router } from "./trpc"
@@ -27,6 +27,7 @@ export const examRouter = router({
           },
           department: true,
           students: true,
+          dates: true,
         },
       })
       return res
@@ -108,4 +109,51 @@ export const examRouter = router({
     .mutation(async ({ input: id }) => {
       //
     }),
+  getDetailed: publicProcedure
+    .input(z.string())
+    .query(async ({ input: id }): Promise<ExamDetailsWithDate | null> => {
+      return await getDetailedExam(id)
+    }),
+  preview: publicProcedure
+    .input(z.string())
+    .query(async ({ input: id }): Promise<ExamDetailsWithDate | null> => {
+      return await getDetailedExam(id)
+    }),
 })
+
+export const getDetailedExam = async (id: string) => {
+  return await db.exam.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      dates: {
+        orderBy: {
+          date: "asc",
+        },
+        include: {
+          fn: true,
+          an: true,
+        },
+      },
+      department: true,
+      students: true,
+      halls: {
+        where: {
+          examId: id,
+          rootHallId: {
+            not: null,
+          },
+        },
+        include: {
+          department: true,
+          seats: {
+            include: {
+              student: true,
+            },
+          },
+        },
+      },
+    },
+  })
+}
