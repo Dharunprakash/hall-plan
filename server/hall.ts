@@ -66,34 +66,55 @@ export const hallRouter = router({
       }): Promise<HallWithSeatsAndDept[]> => {
         const query: Prisma.HallFindManyArgs = {
           where: {
-            rootHall: {
-              is: null,
-            },
+            AND: [
+              {
+                rootHall: {
+                  is: null,
+                },
+              },
+            ],
           },
         }
         if (examId) {
           query.where = {
-            examId: examId,
-            rootHallId: {
-              not: null,
-            },
-          }
-        }
-        if (!(!departmentCodes || departmentCodes.length === 0)) {
-          query.where = {
-            ...query.where,
-            department: { code: { in: departmentCodes } },
+            AND: [
+              { examId: examId },
+              {
+                rootHallId: {
+                  not: null,
+                },
+              },
+              !(!departmentCodes || departmentCodes.length === 0)
+                ? {
+                    department: {
+                      code: {
+                        in: departmentCodes,
+                      },
+                    },
+                  }
+                : {
+                    NOT: {
+                      department: {
+                        code: {
+                          in: [],
+                        },
+                      },
+                    },
+                  },
+            ],
           }
         }
         console.log(query)
         console.log(examId)
-        return await db.hall.findMany({
+        const res = await db.hall.findMany({
           ...query,
           include: {
             seats: true,
             department: true,
           },
         })
+        console.log(new Set(res.map((res) => res.examId)))
+        return res
       }
     ),
   create: publicProcedure

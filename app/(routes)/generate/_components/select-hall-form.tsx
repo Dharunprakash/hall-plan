@@ -30,8 +30,9 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   const [selectedDepts, setSelected] = useState<string[]>([])
 
   const { data: departments } = trpc.department.getAll.useQuery()
-  const { data: halls, error } =
-    trpc.hall.getAllByDeptCode.useQuery(selectedDepts)
+  const { data: halls, error } = trpc.hall.getAllMultiple.useQuery({
+    departmentCodes: selectedDepts,
+  })
 
   // const createExam = trpc.exam.create.useMutation({
   //   onSuccess: () => {

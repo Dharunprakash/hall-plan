@@ -4,9 +4,11 @@ import { z } from "zod"
 import { ExamDetails, ExamDetailsWithDate } from "@/types/exam"
 import { db } from "@/lib/db"
 
+import { planRouter } from "./plan"
 import { publicProcedure, router } from "./trpc"
 
 export const examRouter = router({
+  plan: planRouter,
   get: publicProcedure
     .input(z.string())
     .query(async ({ input: id }): Promise<ExamDetails | null> => {
@@ -104,11 +106,6 @@ export const examRouter = router({
   getExamsCount: publicProcedure.input(z.string()).query(async () => {
     return await db.exam.count()
   }),
-  generate: publicProcedure
-    .input(z.string())
-    .mutation(async ({ input: id }) => {
-      //
-    }),
   getDetailed: publicProcedure
     .input(z.string())
     .query(async ({ input: id }): Promise<ExamDetailsWithDate | null> => {

@@ -82,9 +82,21 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
 
     const halls = await db.hall.findMany({
       where: {
-        id: {
-          in: Array.from(hallDetails.selectedHalls),
-        },
+        AND: [
+          {
+            id: {
+              in: Array.from(hallDetails.selectedHalls),
+            },
+          },
+          {
+            rootHallId: null,
+          },
+          {
+            rootHall: {
+              is: null,
+            },
+          },
+        ],
       },
       include: {
         department: true,
@@ -103,9 +115,11 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
             type: hallType as HallArrangementType,
             seats: {
               createMany: {
-                data: hall.seats.map(({ id, hallId, studentId, ...seat }) => ({
-                  ...seat,
-                })),
+                data: hall.seats.map(
+                  ({ id, hallId, studentId, year, semester, ...seat }) => ({
+                    ...seat,
+                  })
+                ),
               },
             },
           },
