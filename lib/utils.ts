@@ -1,5 +1,6 @@
 import { inputExcelFormSchema, studentSchema } from "@/schemas/student"
 import { clsx, type ClassValue } from "clsx"
+import { formatDate } from "date-fns"
 import jsPDF from "jspdf"
 import { Seat, Student } from "prisma/prisma-client"
 import { UseFormReturn } from "react-hook-form"
@@ -204,4 +205,20 @@ export function intToRoman(num: number): string {
     }
   }
   return result
+}
+
+export const getStartDate = (dates: Date[]): Date => {
+  return dates.reduce((a, b) => (a < b ? a : b))
+}
+export const getEndDate = (dates: Date[]): Date => {
+  return dates.reduce((a, b) => (a > b ? a : b))
+}
+export const getStartAndEndDate = (dates: Date[]): [Date, Date] => {
+  return [getStartDate(dates), getEndDate(dates)]
+}
+export const getFormatedStartAndEndDate = (dates: Date[]): [string, string] => {
+  return [
+    formatDate(getStartDate(dates), "dd/MM/yy"),
+    formatDate(getEndDate(dates), "dd/MM/yy"),
+  ]
 }

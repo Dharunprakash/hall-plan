@@ -28,7 +28,7 @@ const TabsBar = ({ className }: { className?: string }) => {
     {
       name: "Plan",
       route: "/output",
-      path: `/generate/${params.id}/output/hall-plan`,
+      path: `/generate/${params.id}/output?planType=hall-plan`,
     },
   ]
   return (
