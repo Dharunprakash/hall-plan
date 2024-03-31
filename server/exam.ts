@@ -104,4 +104,9 @@ export const examRouter = router({
   getExamsCount: publicProcedure.input(z.string()).query(async () => {
     return await db.exam.count()
   }),
+  generate: publicProcedure
+    .input(z.string())
+    .mutation(async ({ input: id }) => {
+      //
+    }),
 })
