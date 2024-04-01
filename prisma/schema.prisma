@@ -165,6 +165,8 @@ model Timing {
   time     String
   fnDateId String? @unique @db.ObjectId
   anDateId String? @unique @db.ObjectId
+  fnCheck Boolean?
+  anCheck Boolean?
   fnDate   Date?   @relation(fields: [fnDateId], references: [id], name: "fn", onDelete: Cascade)
   anDate   Date?   @relation(fields: [anDateId], references: [id], name: "an", onDelete: Cascade)
 }
