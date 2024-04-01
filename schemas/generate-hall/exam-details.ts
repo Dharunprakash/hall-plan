@@ -31,3 +31,7 @@ export const ExamDetailsType = z.discriminatedUnion("type", [
   InternalExamDetailsSchema,
   PracticalExamDetailsSchema,
 ])
+
+
+
+
