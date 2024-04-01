@@ -134,11 +134,23 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
             examId: exam.id,
             fn:
               detail.timings.fn && timingDetails.type !== "an"
-                ? { create: { time: timingDetails.fn } }
+                ? {
+                    create: {
+                      time: timingDetails.fn,
+                      fnCheck: true,
+                      anCheck: detail.timings.an,
+                    },
+                  }
                 : undefined,
             an:
               detail.timings.an && timingDetails.type !== "fn"
-                ? { create: { time: timingDetails.an } }
+                ? {
+                    create: {
+                      time: timingDetails.an,
+                      anCheck: true,
+                      fnCheck: detail.timings.fn,
+                    },
+                  }
                 : undefined,
           },
         }

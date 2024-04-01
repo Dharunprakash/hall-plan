@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Control, UseFormSetValue, useForm } from "react-hook-form"
 import { z } from "zod"
 
+import { cn } from "@/lib/utils"
 import { useDurationDetails } from "@/hooks/use-duration-details"
 import { usegenerateForm } from "@/hooks/use-generate-form"
 import { Button } from "@/components/ui/button"
@@ -81,7 +82,7 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
                   <FormControl>
                     <>
                       <Input
-                        className="max-w-xs"
+                        className={"max-w-xs"}
                         placeholder="shadcn"
                         {...field}
                         type="date"
@@ -124,9 +125,11 @@ const DateForm = ({ onClose }: { onClose?: () => void }) => {
 export const Timing = ({
   control,
   setValue,
+  innerClassName,
 }: {
   control: Control<z.infer<typeof TimingDetailsType>> | undefined
   setValue: UseFormSetValue<z.infer<typeof TimingDetailsType>>
+  innerClassName?: string
 }) => {
   const isAnSelected = useDurationDetails((s) => s.isAnSelected)
   const isFnSelected = useDurationDetails((s) => s.isFnSelected)
@@ -153,7 +156,7 @@ export const Timing = ({
               <FormLabel>FN Time</FormLabel>
               <FormControl>
                 <Input
-                  className="max-w-xs"
+                  className={cn("max-w-xs", innerClassName)}
                   placeholder="1:30-4:30"
                   {...field}
                   onChange={(e) => {
@@ -173,7 +176,7 @@ export const Timing = ({
               <FormLabel>AN Time</FormLabel>
               <FormControl>
                 <Input
-                  className="max-w-xs"
+                  className={cn("max-w-xs", innerClassName)}
                   placeholder="1:30-4:30"
                   {...field}
                   onChange={(e) => {
@@ -199,7 +202,7 @@ export const Timing = ({
               <FormLabel>FN Time</FormLabel>
               <FormControl>
                 <Input
-                  className="max-w-xs"
+                  className={cn("max-w-xs", innerClassName)}
                   placeholder="1:30-4:30"
                   {...field}
                   onChange={(e) => {
@@ -225,7 +228,7 @@ export const Timing = ({
               <FormLabel>AN Time</FormLabel>
               <FormControl>
                 <Input
-                  className="max-w-xs"
+                  className={cn("max-w-xs", innerClassName)}
                   placeholder="1:30-4:30"
                   {...field}
                   onChange={(e) => {
@@ -251,7 +254,7 @@ export const Timing = ({
             <FormLabel>FN Time</FormLabel>
             <FormControl>
               <Input
-                className="max-w-xs"
+                className={cn("max-w-xs", innerClassName)}
                 placeholder="1:30-4:30"
                 {...field}
                 onChange={(e) => {

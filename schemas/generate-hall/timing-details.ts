@@ -1,7 +1,7 @@
 import { z } from "zod"
 
-const timeFormatRegex =
-  /^(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]-([0-9]|1[0-9]|2[0-3])\.[0-5][0-9]$/
+export const timeFormatRegex =
+  /^(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]-(0[0-9]|1[0-9]|2[0-3])\.[0-5][0-9]$/
 
 const validationSchema = z.object({
   time: z
@@ -21,6 +21,10 @@ export const TimingDetailsSchema = z.object({
   selectedYears: z
     .set(z.string())
     .min(1, { message: "Select at least one year" }),
+})
+
+export const EditTimingDetail = z.object({
+  date: z.string().min(1, { message: "Date is required" }),
 })
 
 export const AnTimingSchema = z
