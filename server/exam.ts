@@ -1,3 +1,5 @@
+import { editSchema } from "@/schemas/generate-hall/edit-schema"
+import { select } from "@nextui-org/react"
 import { ExamType } from "@prisma/client"
 import { z } from "zod"
 
@@ -34,6 +36,29 @@ export const examRouter = router({
       })
       return res
     }),
+
+  editExam: publicProcedure.input(z.string()).query(async ({ input: id }) => {
+    const res = await db.exam.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        halls: {
+          select: {
+            type: true,
+          },
+        },
+        dates: {
+          include: {
+            an: true,
+            fn: true,
+          },
+        },
+      },
+    })
+    return res
+  }),
+
   delete: publicProcedure.input(z.string()).query(async ({ input: id }) => {
     const studentIds = await db.student.findMany({
       where: {

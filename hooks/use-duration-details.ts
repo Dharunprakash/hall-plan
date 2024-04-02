@@ -4,15 +4,18 @@ export type DurationDetails = {
   date: string
   timings: { fn: boolean; an: boolean }
 }
-
-type UseDurationDetails = {
+type DurationStateType = {
   isAnSelected: boolean
   isFnSelected: boolean
   details: DurationDetails[]
+}
+
+type UseDurationDetails = DurationStateType & {
   getDates: () => string[]
   addDate: (date: string) => void
   removeDate: (date: string) => void
   setDates: (dates: string[]) => void
+  setData: ({ details, isAnSelected, isFnSelected }: DurationStateType) => void
   setTimingsForDate: (
     date: string,
     timings: { fn: boolean; an: boolean }
@@ -25,6 +28,8 @@ const durationDetailsStore: MyStateCreator = (set, get) => ({
   isAnSelected: false,
   isFnSelected: false,
   details: [],
+  setData: ({ isAnSelected, isFnSelected, details }) =>
+    set({ isAnSelected, isFnSelected, details }),
   getDates: () => get().details.map((d) => d.date),
   addDate: (date) => {
     if (get().details.find((d) => d.date === date)) return
