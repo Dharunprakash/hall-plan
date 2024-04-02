@@ -106,6 +106,13 @@ export const planRouter = router({
         throw new Error("Not enough seats")
       }
       const groupedStudents = groupStudentsByDeptYear(students)
+      console.log(
+        groupedStudents.map(([key, s]) => ({
+          year: key.year,
+          dept: key.dept,
+          std: s.map((d) => ({ sec: d.section, rno: d.rollno })),
+        }))
+      )
       const studentsCountArr = groupedStudents.map(
         ([key, student]) => student.length
       )
@@ -142,7 +149,13 @@ export const planRouter = router({
           (_, ind) => segregatedSeats.seatsTypeForHalls[ind] === 2
         ),
       }
-      console.log(groupStudentBySeatCombination)
+      console.log(
+        groupStudentBySeatCombination[1].map(([key, s]) => ({
+          year: key.year,
+          dept: key.dept,
+          std: s.map((d) => ({ sec: d.section, rno: d.rollno })),
+        }))
+      )
       console.log(groupHallBySeatCombination)
       const promises1 = fillHalls({
         groupedStudents: groupStudentBySeatCombination[1],
@@ -179,13 +192,14 @@ export const fillHalls = ({
     for (let i = 0; i < groupedStudents.length; i++) {
       // return plan.generateAlternatePlan(combinations, groupedStudents, groupedHalls)
       let stdSize = groupedStudents[i][1].length
+      let stdPtr = 0
       let hallSize = groupedHalls[hallPtr].seats.length
       let seatPtr = 0
-
-      while (stdSize) {
-        hallSize--
-        stdSize--
-        if (groupedHalls[hallPtr].seats[seatPtr].isBlocked) {
+      while (stdPtr < stdSize) {
+        if (
+          seatPtr < hallSize &&
+          groupedHalls[hallPtr].seats[seatPtr].isBlocked
+        ) {
           seatPtr++
           continue
         }
@@ -193,26 +207,31 @@ export const fillHalls = ({
           if (seatPtr % 2 === 1) seatPtr++
         }
         if (hallType === "ALTERNATE") {
-          if (groupedHalls[hallPtr].seats[seatPtr].col % 2 === 1) seatPtr++
+          if (
+            seatPtr < hallSize &&
+            groupedHalls[hallPtr].seats[seatPtr].col % 2 === 1
+          )
+            seatPtr++
         }
-        if (hallSize) {
+        if (seatPtr < hallSize) {
           promises.push(
             db.seat.update({
               where: {
-                id: groupedHalls[hallPtr].seats[hallSize].id,
+                id: groupedHalls[hallPtr].seats[seatPtr].id,
               },
               data: {
                 student: {
                   connect: {
-                    id: groupedStudents[i][1][stdSize].id,
+                    id: groupedStudents[i][1][stdPtr].id,
                   },
                 },
-                year: groupedStudents[i][1][stdSize].year,
-                semester: groupedStudents[i][1][stdSize].semester,
+                year: groupedStudents[i][1][stdPtr].year,
+                semester: groupedStudents[i][1][stdPtr].semester,
               },
             })
           )
-          seatPtr += 1
+          stdPtr++
+          seatPtr++
         } else {
           hallPtr++
           seatPtr = 0

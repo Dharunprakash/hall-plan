@@ -51,11 +51,12 @@ export const groupStudentsByDeptYear = (
       JSON.parse(key) as { dept: string; year: number },
       Array.from(students) as StudentWithDept[],
     ])
+  console.log(res)
   return res.sort((a, b) => {
     if (a[0].dept < b[0].dept) return -1
     if (a[0].dept > b[0].dept) return 1
     if (a[0].year < b[0].year) return -1
     if (a[0].year > b[0].year) return 1
-    return 0
+    return 1
   })
 }

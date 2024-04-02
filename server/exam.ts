@@ -134,8 +134,35 @@ export const getDetailedExam = async (id: string) => {
         },
       },
       department: true,
-      students: true,
+      students: {
+        orderBy: [
+          {
+            department: {
+              code: "asc",
+            },
+          },
+          {
+            year: "asc",
+          },
+          {
+            section: "asc",
+          },
+          {
+            rollno: "asc",
+          },
+        ],
+      },
       halls: {
+        orderBy: [
+          {
+            department: {
+              code: "asc",
+            },
+          },
+          {
+            hallno: "asc",
+          },
+        ],
         where: {
           examId: id,
           rootHallId: {
@@ -145,8 +172,32 @@ export const getDetailedExam = async (id: string) => {
         include: {
           department: true,
           seats: {
+            orderBy: [
+              {
+                hall: {
+                  department: {
+                    code: "asc",
+                  },
+                },
+              },
+              {
+                hall: {
+                  hallno: "asc",
+                },
+              },
+              {
+                row: "asc",
+              },
+              {
+                col: "asc",
+              },
+            ],
             include: {
-              student: true,
+              student: {
+                include: {
+                  department: true,
+                },
+              },
             },
           },
         },
