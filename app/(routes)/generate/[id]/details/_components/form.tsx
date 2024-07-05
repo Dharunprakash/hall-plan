@@ -31,7 +31,7 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
   const { data: departments } = trpc.department.getAll.useQuery()
   const addDate = useDurationDetails((s) => s.addDate)
   const setData = useDurationDetails((s) => s.setData)
-
+  console.log(exam.name,exam.dates)
   const form = useForm<z.infer<typeof editSchema>>({
     resolver: zodResolver(editSchema),
     defaultValues: {
@@ -79,7 +79,7 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
 
   return (
     <div>
-      <div className="grid justify-end ">
+      <div className="grid justify-end">
         <div className="mr-4 space-x-4">
           {editing ? (
             <Button onClick={handleEdit}>Cancel</Button>
@@ -90,7 +90,7 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
         </div>
       </div>
       {/* Your form JSX goes here */}
-      <div>
+      <div >
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -100,8 +100,9 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
               <h1>Exam Details</h1>
             </div>
             <div className="grid w-full grid-cols-1 gap-16 md:grid-cols-3">
+
+            {editing ? (
               <FormField
-                disabled={!editing}
                 control={form.control}
                 name="type"
                 render={({ field }) => (
@@ -140,76 +141,102 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
                   </FormItem>
                 )}
               />
-              <FormField
-                disabled={!editing}
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Seriel Test"
-                        {...field} // Spread field props
-                        onChange={(e) => field.onChange(e)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                disabled={!editing}
-                control={form.control}
-                name="academicYear"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Academic Year</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="2023-2024"
-                        {...field} // Spread field props
-                        onChange={(e) => field.onChange(e)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                disabled={!editing}
-                control={form.control}
-                name="semester"
-                render={({ field }) => {
-                  console.log(field.value)
-                  return (
-                    <FormItem>
-                      <FormLabel>Semester</FormLabel>
-                      <Select
-                        {...field}
-                        value={field.value}
-                        isDisabled={!editing}
-                        defaultSelectedKeys={
-                          field.value ? [field.value] : undefined
-                        }
-                        placeholder="Select Semester"
-                      >
-                        <SelectItem key={"ODD"} value={"ODD"}>
-                          ODD
-                        </SelectItem>
-                        <SelectItem key={"EVEN"} value={"EVEN"}>
-                          EVEN
-                        </SelectItem>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )
-                }}
-              />
-              {(testType === "INTERNAL" || testType === "MODEL_PRACTICAL") && (
+            ) : (
+              <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+                <span className="text-gray-600 ">Test type</span>
+                <span className="font-semibold">{exam.type}</span>
+              </div>
+            )}
+
+              {editing ? (
                 <FormField
                   control={form.control}
-                  disabled={!editing}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Seriel Test"
+                          {...field} // Spread field props
+                          onChange={(e) => field.onChange(e)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+                  <span className=" text-gray-600 ">Name</span>
+                  <span className="font-semibold">{exam.name}</span>
+                </div>
+              )}
+            
+              {editing ? (
+                <FormField
+                  control={form.control}
+                  name="academicYear"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Academic Year</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="2023-2024"
+                          {...field} // Spread field props
+                          onChange={(e) => field.onChange(e)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+                  <span className=" text-gray-600 ">Academic Year</span>
+                  <span className="font-semibold">{exam.academicYear}</span>
+                </div>
+              )}
+
+              {editing ? (
+                <FormField
+                  control={form.control}
+                  name="semester"
+                  render={({ field }) => {
+                    console.log(field.value)
+                    return (
+                      <FormItem>
+                        <FormLabel>Semester</FormLabel>
+                        <Select
+                          {...field}
+                          value={field.value}
+                          isDisabled={!editing}
+                          defaultSelectedKeys={
+                            field.value ? [field.value] : undefined
+                          }
+                          placeholder="Select Semester"
+                        >
+                          <SelectItem key={"ODD"} value={"ODD"}>
+                            ODD
+                          </SelectItem>
+                          <SelectItem key={"EVEN"} value={"EVEN"}>
+                            EVEN
+                          </SelectItem>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }}
+                />
+              ) : (
+                <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+                  <span className=" text-gray-600 ">Semester</span>
+                  <span className="font-semibold">{exam.semester}</span>
+                </div>
+              )}
+              {/* {editing && (testType === "INTERNAL" || testType === "MODEL_PRACTICAL") && (
+                <FormField
+                  control={form.control}
                   name="departmentId"
                   render={({ field }) => (
                     <FormItem>
@@ -234,41 +261,89 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
                     </FormItem>
                   )}
                 />
-              )}
+              ):(
+                <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+                  <span className=" text-gray-600 ">Department</span>
+                  <span className="font-semibold">{exam.department?.code}</span>
+                </div>
+              )} */}
+              {
+                editing ? (testType === "INTERNAL" || testType === "MODEL_PRACTICAL") && (
+                  <FormField
+                    control={form.control}
+                    name="departmentId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Department</FormLabel>
+                        {departments && (
+                          <Select
+                            placeholder="Select Department"
+                            isDisabled={!editing}
+                            onChange={field.onChange}
+                            defaultSelectedKeys={
+                              field.value ? [field.value] : undefined
+                            }
+                          >
+                            {departments?.map((department) => (
+                              <SelectItem key={department.id}>
+                                {department.code}
+                              </SelectItem>
+                            ))}
+                          </Select>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                    (testType === "INTERNAL" || testType === "MODEL_PRACTICAL") && (
+                      <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+                        <span className=" text-gray-600 ">Department</span>
+                        <span className="font-semibold">{exam.department?.code}</span>
+                      </div>
+                    )
+                )      
+              }
 
-              <FormField
-                disabled={!editing}
-                control={form.control}
-                name="halltype"
-                render={({ field }) => {
-                  console.log(field.value)
-                  return (
-                    <FormItem>
-                      <FormLabel>Hall type</FormLabel>
-                      <Select
-                        {...field}
-                        value={field.value}
-                        isDisabled={!editing}
-                        defaultSelectedKeys={
-                          field.value ? [field.value] : undefined
-                        }
-                        placeholder="Select HallType"
-                      >
-                        <SelectItem key={"NORMAL"} value={"NORMAL"}>
-                          Normal
-                        </SelectItem>
-                        <SelectItem key={"STAGGERED"} value={"STAGGERED"}>
-                          Staggered
-                        </SelectItem>
-                        <SelectItem key={"ALTERNATE"} value={"ALTERNATE"}>
-                          Alternate
-                        </SelectItem>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )
-                }}
-              />
+              {editing ? (
+                <FormField
+                  control={form.control}
+                  name="halltype"
+                  render={({ field }) => {
+                    console.log(field.value)
+                    return (
+                      <FormItem>
+                        <FormLabel>Hall type</FormLabel>
+                        <Select
+                          {...field}
+                          value={field.value}
+                          isDisabled={!editing}
+                          defaultSelectedKeys={
+                            field.value ? [field.value] : undefined
+                          }
+                          placeholder="Select HallType"
+                        >
+                          <SelectItem key={"NORMAL"} value={"NORMAL"}>
+                            Normal
+                          </SelectItem>
+                          <SelectItem key={"STAGGERED"} value={"STAGGERED"}>
+                            Staggered
+                          </SelectItem>
+                          <SelectItem key={"ALTERNATE"} value={"ALTERNATE"}>
+                            Alternate
+                          </SelectItem>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }}
+                />
+              ) : (
+                <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+                  <span className=" text-gray-600 ">Hall type</span>
+                  <span className="font-semibold">{exam.halls[0].type}</span>
+                </div>
+              )}       
             </div>
             <div className="text-center font-semibold">
               <h1>Time Details</h1>
@@ -276,7 +351,7 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
             <div className="grid w-full  gap-y-4">
               {/* @tsignore */}
               <div className="grid w-full grow grid-cols-3 gap-10">
-                <Timing control={form.control} setValue={form.setValue} />
+                <Timing control={form.control} setValue={form.setValue} editing={editing} exam={exam} />
               </div>
               <div className="grid w-full  grid-cols-3 gap-5">
                 <FormField
@@ -323,10 +398,14 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
 }
 
 const Timing = ({
+  exam,
+  editing,
   control,
   setValue,
   innerClassName,
 }: {
+  exam: ExamDetailsWithDate
+  editing: boolean
   control: Control<z.infer<typeof editSchema>> | undefined
   setValue: UseFormSetValue<z.infer<typeof editSchema>>
   innerClassName?: string
@@ -349,6 +428,66 @@ const Timing = ({
   if (isAnSelected && isFnSelected)
     return (
       <>
+        
+
+        {editing ? (
+          <FormField
+            control={control}
+            name="fn"
+            render={({ field }) => (
+              <FormItem className="">
+                <FormLabel>FN Time</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="1:30-4:30"
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e)
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ) : (
+          <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+            <span className=" text-gray-600 ">FN Time</span>
+            <span className="font-semibold">{exam.timingFn}</span>
+          </div>
+        )}
+          
+        {
+          editing ? (
+            <FormField
+              control={control}
+              name="an"
+              render={({ field }) => (
+                <FormItem className="">
+                  <FormLabel>AN Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="1:30-4:30"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e)
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
+            <div className="mx-4 grid grid-cols-1 gap-0 rounded-lg bg-[#cbfcf8cc] p-2">
+              <span className=" text-gray-600 ">AN Time</span>
+              <span className="font-semibold">{exam.timingAn}</span>
+            </div>
+          )
+        }
+
+      
+{/* 
         <FormField
           control={control}
           name="fn"
@@ -367,8 +506,9 @@ const Timing = ({
               <FormMessage />
             </FormItem>
           )}
-        />
-        <FormField
+        /> */}
+
+        {/* <FormField
           control={control}
           name="an"
           render={({ field }) => (
@@ -386,7 +526,7 @@ const Timing = ({
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
       </>
     )
   if (isFnSelected)

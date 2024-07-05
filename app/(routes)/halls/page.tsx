@@ -14,6 +14,7 @@ const page = async ({
     dept?: string
   }
 }) => {
+  console.log("HELLO", searchParams.dept)
   const halls = await serverClient.hall.getAllMultiple({
     departmentCodes: searchParams.dept?.split("-"),
   })

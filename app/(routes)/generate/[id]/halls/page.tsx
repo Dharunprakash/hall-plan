@@ -18,7 +18,7 @@ const page = async ({
     id: string
   }
 }) => {
-  console.log(params.id)
+  console.log("HELLO", searchParams.dept)
   const halls = await serverClient.hall.getAllMultiple({
     departmentCodes: searchParams.dept?.split("-"),
     examId: params.id,

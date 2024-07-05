@@ -24,7 +24,7 @@ export const hallRouter = router({
   getAllByDeptCode: publicProcedure
     .input(z.array(z.string()))
     .query(async ({ input: departmentCode }) => {
-      console.log(departmentCode)
+      console.log("DEPARTMENT", departmentCode)
       // return await db.hall.findMany({ include: { seats: true, department: true } });
       return await db.hall.findMany({
         where: {
@@ -64,6 +64,7 @@ export const hallRouter = router({
       async ({
         input: { departmentCodes, examId },
       }): Promise<HallWithSeatsAndDept[]> => {
+        console.log(departmentCodes)
         const query: Prisma.HallFindManyArgs = {
           where: {
             AND: [
@@ -82,6 +83,33 @@ export const hallRouter = router({
               {
                 rootHallId: {
                   not: null,
+                },
+              },
+              !(!departmentCodes || departmentCodes.length === 0)
+                ? {
+                    department: {
+                      code: {
+                        in: departmentCodes,
+                      },
+                    },
+                  }
+                : {
+                    NOT: {
+                      department: {
+                        code: {
+                          in: [],
+                        },
+                      },
+                    },
+                  },
+            ],
+          }
+        } else {
+          query.where = {
+            AND: [
+              {
+                rootHall: {
+                  is: null,
                 },
               },
               !(!departmentCodes || departmentCodes.length === 0)
