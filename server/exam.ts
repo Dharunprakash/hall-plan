@@ -59,7 +59,7 @@ export const examRouter = router({
     return res
   }),
 
-  delete: publicProcedure.input(z.string()).query(async ({ input: id }) => {
+  delete: publicProcedure.input(z.string()).mutation(async ({ input: id }) => {
     const studentIds = await db.student.findMany({
       where: {
         examIds: {
