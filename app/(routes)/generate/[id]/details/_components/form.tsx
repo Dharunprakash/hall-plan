@@ -31,6 +31,7 @@ const FormPage = ({ exam }: { exam: ExamDetailsWithDate }) => {
   const { data: departments } = trpc.department.getAll.useQuery()
   const addDate = useDurationDetails((s) => s.addDate)
   const setData = useDurationDetails((s) => s.setData)
+  console.log(exam.halls)
   console.log(exam.name,exam.dates)
   const form = useForm<z.infer<typeof editSchema>>({
     resolver: zodResolver(editSchema),

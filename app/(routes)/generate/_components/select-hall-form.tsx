@@ -93,12 +93,16 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
       examDetails: examDetails!,
       timingDetails: timingDetails!,
     }
+    console.log("hi")
     try {
       await createExam(fullData)
+      console.log("exam created")
       toast.remove()
       toast.success("Exam created successfully")
+      onClose && onClose()
       setStep(1)
     } catch (error: any) {
+      console.log(error)
       toast.remove()
       toast.error(error.message)
     }

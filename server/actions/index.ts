@@ -59,101 +59,96 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
   })
 
   try {
-    const exam = await db.exam.create({
-      data: {
-        academicYear: examDetails.academicYear,
-        name: examDetails.name,
-        semester: examDetails.semester,
-        departmentId:
-          examDetails.type === "INTERNAL" ||
-          examDetails.type === "MODEL_PRACTICAL"
-            ? examDetails.departmentId
-            : null,
-        timingAn: timingDetails.type !== "fn" ? timingDetails.an : null,
-        timingFn: timingDetails.type !== "an" ? timingDetails.fn : null,
-        type: examDetails.type,
-        students: {
-          connect: studentIds,
+    return await db.$transaction(async (tx) => {
+      const exam = await tx.exam.create({
+        data: {
+          academicYear: examDetails.academicYear,
+          name: examDetails.name,
+          semester: examDetails.semester,
+          departmentId:
+            examDetails.type === "INTERNAL" ||
+            examDetails.type === "MODEL_PRACTICAL"
+              ? examDetails.departmentId
+              : null,
+          timingAn: timingDetails.type !== "fn" ? timingDetails.an : null,
+          timingFn: timingDetails.type !== "an" ? timingDetails.fn : null,
+          type: examDetails.type,
+          students: {
+            connect: studentIds,
+          },
         },
-      },
-    })
+      })
 
-    // Handle halls creation here...
-
-    const halls = await db.hall.findMany({
-      where: {
-        AND: [
-          {
-            id: {
-              in: Array.from(hallDetails.selectedHalls),
-            },
+      // Handle halls creation here...
+      console.log(hallDetails.selectedHalls)
+      let halls = await tx.hall.findMany({
+        where: {
+          id: {
+            in: Array.from(hallDetails.selectedHalls),
           },
-          {
-            rootHallId: null,
-          },
-          {
-            rootHall: {
-              is: null,
-            },
-          },
-        ],
-      },
-      include: {
-        department: true,
-        seats: true,
-      },
-    })
-
-    const newHallsThatAreCopyOfItsParentPromise = Promise.all(
-      halls.map(({ type, id, department, ...hall }) => {
-        return db.hall.create({
-          data: {
-            ...hall,
-            rootHallId: id,
-            departmentId: hall.departmentId,
-            examId: exam.id,
-            type: hallType as HallArrangementType,
-            seats: {
-              createMany: {
-                data: hall.seats.map(
-                  ({ id, hallId, studentId, year, semester, ...seat }) => ({
-                    ...seat,
-                  })
-                ),
+        },
+        include: {
+          department: true,
+          seats: true,
+        },
+      })
+      console.log(halls)
+      if (halls.length === 0) {
+        throw new Error("No halls selected")
+      }
+      const newHallsThatAreCopyOfItsParentPromise = Promise.all(
+        halls.map(({ type, id, department, ...hall }) => {
+          return tx.hall.create({
+            data: {
+              ...hall,
+              rootHallId: id,
+              departmentId: hall.departmentId,
+              examId: exam.id,
+              type: hallType as HallArrangementType,
+              seats: {
+                createMany: {
+                  data: hall.seats.map(
+                    ({ id, hallId, studentId, year, semester, ...seat }) => ({
+                      ...seat,
+                    })
+                  ),
+                },
               },
             },
-          },
+          })
         })
-      })
-    )
-    const examDatesPromise = Promise.all(
-      durationDetails.map((detail) => {
-        const data: Prisma.DateCreateArgs<DefaultArgs> = {
-          data: {
-            date: new Date(detail.date),
-            examId: exam.id,
-            fn:
-              detail.timings.fn && timingDetails.type !== "an"
-                ? {
-                    create: {
-                      time: timingDetails.fn,
-                    },
-                  }
-                : undefined,
-            an:
-              detail.timings.an && timingDetails.type !== "fn"
-                ? {
-                    create: {
-                      time: timingDetails.an,
-                    },
-                  }
-                : undefined,
-          },
-        }
-        return db.date.create(data)
-      })
-    )
-    redirect(`/generate/${exam.id}/details`)
+      )
+
+      const examDatesPromise = Promise.all(
+        durationDetails.map((detail) => {
+          const data: Prisma.DateCreateArgs<DefaultArgs> = {
+            data: {
+              date: new Date(detail.date),
+              examId: exam.id,
+              fn:
+                detail.timings.fn && timingDetails.type !== "an"
+                  ? {
+                      create: {
+                        time: timingDetails.fn,
+                      },
+                    }
+                  : undefined,
+              an:
+                detail.timings.an && timingDetails.type !== "fn"
+                  ? {
+                      create: {
+                        time: timingDetails.an,
+                      },
+                    }
+                  : undefined,
+            },
+          }
+          return tx.date.create(data)
+        })
+      )
+      console.log("Creating exam...")
+      redirect(`/generate/${exam.id}/details`)
+    })
     // const res = await db.exam.findUnique({
     //   where: {
     //     id: exam.id,
