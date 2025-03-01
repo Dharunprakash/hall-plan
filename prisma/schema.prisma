@@ -137,7 +137,7 @@ model Exam {
   // ONLY FOR INTERNAL AND MODEL_PRACTICAL THE DEPARTMENT IS REQUIRED
   departmentId String?     @db.ObjectId
   department   Department? @relation(fields: [departmentId], references: [id])
-  Arrangementtype HallArrangementType? @default(NORMAL)
+  arrangementtype HallArrangementType? @default(NORMAL)
   semester     OddEven
   studentIds   String[]  @db.ObjectId
   students     Student[] @relation(fields: [studentIds], references: [id])
