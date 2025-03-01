@@ -22,11 +22,9 @@ export const checkSameHallNoExists = async (
 }
 export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
   const validatedFields = GenerateHallSchema.safeParse(input)
-
   if (!validatedFields.success) {
     return { error: "Invalid fields!" }
   }
-
   const {
     examDetails,
     timingDetails,
@@ -39,41 +37,44 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
   const selectedYears = Array.from(timingDetails.selectedYears).map(Number)
 
   try {
-  const studentsPromise = db.student.findMany({
-    where: {
-      AND: [
-        {
-          departmentId: {
-            in: Array.from(timingDetails.departments),
+    const studentsPromise = db.student.findMany({
+      where: {
+        AND: [
+          {
+            departmentId: {
+              in: Array.from(timingDetails.departments),
+            },
           },
-        },
-        {
-          year: {
-            in: selectedYears,
+          {
+            year: {
+              in: selectedYears,
+            },
           },
-        },
-      ],
-    },
-    select: {
-      id: true,
-    },
-  })
-
-  console.log(hallDetails.selectedHalls)
-  const hallsPromise = await db.hall.findMany({
-    where: {
-      id: {
-        in: Array.from(hallDetails.selectedHalls),
+        ],
       },
-    },
-    include: {
-      department: true,
-      seats: true,
-    },
-  })
-  const [studentIds, halls] = await Promise.all([studentsPromise, hallsPromise]);
+      select: {
+        id: true,
+      },
+    })
 
-  let examId = ""
+    console.log(hallDetails.selectedHalls)
+    const hallsPromise = await db.hall.findMany({
+      where: {
+        id: {
+          in: Array.from(hallDetails.selectedHalls),
+        },
+      },
+      include: {
+        department: true,
+        seats: true,
+      },
+    })
+    const [studentIds, halls] = await Promise.all([
+      studentsPromise,
+      hallsPromise,
+    ])
+
+    let examId = ""
     await db.$transaction(async (tx) => {
       const exam = await tx.exam.create({
         data: {
@@ -94,7 +95,6 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
           },
         },
       })
-
       // Handle halls creation here...
       console.log(halls)
       if (halls.length === 0) {
@@ -122,7 +122,6 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
           })
         })
       )
-
       const examDatesPromise = Promise.all(
         durationDetails.map((detail) => {
           const data: Prisma.DateCreateArgs<DefaultArgs> = {
@@ -150,7 +149,10 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
           return tx.date.create(data)
         })
       )
-      await Promise.all([newHallsThatAreCopyOfItsParentPromise, examDatesPromise])
+      await Promise.all([
+        newHallsThatAreCopyOfItsParentPromise,
+        examDatesPromise,
+      ])
       console.log("Creating exam...")
       examId = exam.id
     })
@@ -160,7 +162,6 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
     console.error("Error creating exam:", error.message)
   }
 }
-
 export const updateExam = async (
   id: string,
   input: z.infer<typeof GenerateHallSchema>
@@ -173,6 +174,5 @@ export const updateExam = async (
     ...hallDetails
   } = input
   const selectedYears = Array.from(timingDetails.selectedYears).map(Number)
-
   // Do it as efficiently as possible for
 }
