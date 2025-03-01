@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react"
 import { ExamDetailsType } from "@/schemas/generate-hall/exam-details"
 import { HallDetailsSchema } from "@/schemas/generate-hall/hall-details"
