@@ -7,7 +7,7 @@ import { TimingDetailsType } from "./timing-details"
 
 export const GenerateHallSchema = z
   .object({
-    hallType: z.string(),
+    hallType: z.nativeEnum(HallArrangementType),
     examDetails: ExamDetailsType,
     durationDetails: z.array(
       z.object({

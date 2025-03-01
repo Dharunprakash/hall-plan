@@ -7,7 +7,7 @@ type HallType = {
 }
 
 export const useSelectHallType = create<HallType>((set, get) => ({
-  hallType: "NORMAL",
+  hallType: HallArrangementType.NORMAL,
   setHallType: (hallType) => {
     set({ hallType })
   },
