@@ -1,10 +1,13 @@
 "use server"
+
 import { redirect } from "next/navigation"
 import { GenerateHallSchema } from "@/schemas/generate-hall/input-schema"
 import { HallArrangementType, Prisma } from "@prisma/client"
 import { DefaultArgs } from "@prisma/client/runtime/library"
 import { z } from "zod"
+
 import { db } from "@/lib/db"
+
 export const checkSameHallNoExists = async (
   hallno: number,
   departmentId: string
@@ -34,41 +37,44 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
   const selectedYears = Array.from(timingDetails.selectedYears).map(Number)
 
   try {
-  const studentsPromise = db.student.findMany({
-    where: {
-      AND: [
-        {
-          departmentId: {
-            in: Array.from(timingDetails.departments),
+    const studentsPromise = db.student.findMany({
+      where: {
+        AND: [
+          {
+            departmentId: {
+              in: Array.from(timingDetails.departments),
+            },
           },
-        },
-        {
-          year: {
-            in: selectedYears,
+          {
+            year: {
+              in: selectedYears,
+            },
           },
-        },
-      ],
-    },
-    select: {
-      id: true,
-    },
-  })
-
-  console.log(hallDetails.selectedHalls)
-  const hallsPromise = await db.hall.findMany({
-    where: {
-      id: {
-        in: Array.from(hallDetails.selectedHalls),
+        ],
       },
-    },
-    include: {
-      department: true,
-      seats: true,
-    },
-  })
-  const [studentIds, halls] = await Promise.all([studentsPromise, hallsPromise]);
+      select: {
+        id: true,
+      },
+    })
 
-  let examId = ""
+    console.log(hallDetails.selectedHalls)
+    const hallsPromise = await db.hall.findMany({
+      where: {
+        id: {
+          in: Array.from(hallDetails.selectedHalls),
+        },
+      },
+      include: {
+        department: true,
+        seats: true,
+      },
+    })
+    const [studentIds, halls] = await Promise.all([
+      studentsPromise,
+      hallsPromise,
+    ])
+
+    let examId = ""
     await db.$transaction(async (tx) => {
       const exam = await tx.exam.create({
         data: {
@@ -143,7 +149,10 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
           return tx.date.create(data)
         })
       )
-      await Promise.all([newHallsThatAreCopyOfItsParentPromise, examDatesPromise])
+      await Promise.all([
+        newHallsThatAreCopyOfItsParentPromise,
+        examDatesPromise,
+      ])
       console.log("Creating exam...")
       examId = exam.id
     })
