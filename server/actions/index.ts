@@ -64,6 +64,7 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
         data: {
           academicYear: examDetails.academicYear,
           name: examDetails.name,
+          Arrangementtype: hallType,
           semester: examDetails.semester,
           departmentId:
             examDetails.type === "INTERNAL" ||
