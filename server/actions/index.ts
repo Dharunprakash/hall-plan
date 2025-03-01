@@ -38,7 +38,8 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
   console.log(hallDetails.departments)
   const selectedYears = Array.from(timingDetails.selectedYears).map(Number)
 
-  const studentIds = await db.student.findMany({
+  try {
+  const studentsPromise = db.student.findMany({
     where: {
       AND: [
         {
@@ -58,8 +59,22 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
     },
   })
 
-  try {
-    return await db.$transaction(async (tx) => {
+  console.log(hallDetails.selectedHalls)
+  const hallsPromise = await db.hall.findMany({
+    where: {
+      id: {
+        in: Array.from(hallDetails.selectedHalls),
+      },
+    },
+    include: {
+      department: true,
+      seats: true,
+    },
+  })
+  const [studentIds, halls] = await Promise.all([studentsPromise, hallsPromise]);
+
+  let examId = ""
+    await db.$transaction(async (tx) => {
       const exam = await tx.exam.create({
         data: {
           academicYear: examDetails.academicYear,
@@ -80,18 +95,6 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
       })
 
       // Handle halls creation here...
-      console.log(hallDetails.selectedHalls)
-      let halls = await tx.hall.findMany({
-        where: {
-          id: {
-            in: Array.from(hallDetails.selectedHalls),
-          },
-        },
-        include: {
-          department: true,
-          seats: true,
-        },
-      })
       console.log(halls)
       if (halls.length === 0) {
         throw new Error("No halls selected")
@@ -146,30 +149,12 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
           return tx.date.create(data)
         })
       )
+      await Promise.all([newHallsThatAreCopyOfItsParentPromise, examDatesPromise])
       console.log("Creating exam...")
-      redirect(`/generate/${exam.id}/details`)
+      examId = exam.id
     })
-    // const res = await db.exam.findUnique({
-    //   where: {
-    //     id: exam.id,
-    //   },
-    //   include: {
-    //     halls: {
-    //       include: {
-    //         department: true,
-    //         seats: {
-    //           include: {
-    //             student: true,
-    //           },
-    //         },
-    //       },
-    //     },
-    //     dates: true,
-    //     department: true,
-    //     students: true,
-    //   },
-    // })
-    // console.log(res)
+    console.log("Exam created", examId)
+    redirect(`/generate/${examId}/details`)
   } catch (error: any) {
     console.error("Error creating exam:", error.message)
   }
