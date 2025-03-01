@@ -6,10 +6,12 @@ import { TimingDetailsType } from "@/schemas/generate-hall/timing-details"
 import { createExam } from "@/server/actions"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Select, SelectItem, Selection } from "@nextui-org/react"
+import { HallArrangementType } from "@prisma/client"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { z } from "zod"
 
+import { ExamDetails } from "@/types/exam"
 import { useDurationDetails } from "@/hooks/use-duration-details"
 import { usegenerateForm } from "@/hooks/use-generate-form"
 import { useSelectHallType } from "@/hooks/use-select-hall-type"
@@ -26,12 +28,42 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { trpc } from "@/app/_trpc/client"
 
-const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
+const Selecthalls = ({
+  onClose,
+  examId,
+}: {
+  onClose?: () => void
+  examId?: string
+}) => {
   const [selectedDepts, setSelected] = useState<string[]>([])
 
   const { data: departments } = trpc.department.getAll.useQuery()
   const { data: halls, error } = trpc.hall.getAllMultiple.useQuery({
     departmentCodes: selectedDepts,
+  })
+
+  const { data: exam } = trpc.exam.get.useQuery<ExamDetails | null>(
+    examId ?? "",
+    {
+      enabled: !!examId,
+      initialData: null,
+    }
+  )
+
+  const updateHalls = trpc.exam.updateHalls.useMutation({
+    onSuccess: () => {
+      onClose && onClose()
+      toast.remove()
+      toast.success("Halls added to exam successfully")
+    },
+    onError: (error) => {
+      toast.remove()
+      toast.error(
+        error.message
+          ? error.message
+          : "An error occurred while adding halls to exam"
+      )
+    },
   })
 
   // const createExam = trpc.exam.create.useMutation({
@@ -68,8 +100,12 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   const form = useForm<z.infer<typeof HallDetailsSchema>>({
     resolver: zodResolver(HallDetailsSchema),
     defaultValues: {
-      departments: hallDetails?.departments || new Set<string>(),
-      selectedHalls: hallDetails?.selectedHalls || new Set<string>(),
+      departments:
+        hallDetails?.departments ||
+        new Set<string>(exam?.halls?.map((h) => h.department.code) ?? []),
+      selectedHalls:
+        hallDetails?.selectedHalls ||
+        new Set(exam?.halls?.map((h) => h.rootHallId) ?? []),
     },
     mode: "onChange",
   })
@@ -81,6 +117,19 @@ const Selecthalls = ({ onClose }: { onClose?: () => void }) => {
   }
 
   const onSubmit = async (data: z.infer<typeof HallDetailsSchema>) => {
+    if (examId && exam) {
+      toast.loading("Adding halls to exam")
+      const hallArrangementType =
+        (exam.arrangementType ??
+          (!!exam.halls?.length && exam.halls[0]?.type)) ||
+        HallArrangementType.NORMAL
+      updateHalls.mutate({
+        examId,
+        type: hallArrangementType,
+        hallIds: Array.from(data.selectedHalls),
+      })
+      return
+    }
     console.log(examDetails)
     console.log(timingDetails)
     toast.loading("Creating exam")

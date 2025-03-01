@@ -39,41 +39,41 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
   const selectedYears = Array.from(timingDetails.selectedYears).map(Number)
 
   try {
-  const studentsPromise = db.student.findMany({
-    where: {
-      AND: [
-        {
-          departmentId: {
-            in: Array.from(timingDetails.departments),
+    const studentsPromise = db.student.findMany({
+      where: {
+        AND: [
+          {
+            departmentId: {
+              in: Array.from(timingDetails.departments),
+            },
           },
-        },
-        {
-          year: {
-            in: selectedYears,
+          {
+            year: {
+              in: selectedYears,
+            },
           },
-        },
-      ],
-    },
-    select: {
-      id: true,
-    },
-  })
-
-  console.log(hallDetails.selectedHalls)
-  const hallsPromise = await db.hall.findMany({
-    where: {
-      id: {
-        in: Array.from(hallDetails.selectedHalls),
+        ],
       },
-    },
-    include: {
-      department: true,
-      seats: true,
-    },
-  })
-  const [studentIds, halls] = await Promise.all([studentsPromise, hallsPromise]);
+      select: {
+        id: true,
+      },
+    })
 
-  let examId = ""
+    console.log(hallDetails.selectedHalls)
+    const hallsPromise = db.hall.findMany({
+      where: {
+        id: {
+          in: Array.from(hallDetails.selectedHalls),
+        },
+      },
+      include: {
+        department: true,
+        seats: true,
+      },
+    })
+    const [studentIds, halls] = await Promise.all([studentsPromise, hallsPromise])
+
+    let examId = ""
     await db.$transaction(async (tx) => {
       const exam = await tx.exam.create({
         data: {
@@ -134,6 +134,7 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
                   ? {
                       create: {
                         time: timingDetails.fn,
+                        fnDateId: detail.fnDateId ?? undefined, // Ensure fnDateId is not null
                       },
                     }
                   : undefined,
@@ -142,6 +143,7 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
                   ? {
                       create: {
                         time: timingDetails.an,
+                        anDateId: detail.anDateId ?? undefined, // Ensure anDateId is not null
                       },
                     }
                   : undefined,

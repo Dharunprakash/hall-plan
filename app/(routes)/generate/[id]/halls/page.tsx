@@ -6,6 +6,7 @@ import { HallForm } from "@/components/halls/form/create-hall"
 import HallCard from "@/components/halls/hall-card"
 import DialogModal from "@/components/modal/dialog-modal"
 import { serverClient } from "@/app/_trpc/serverClient"
+import Selecthalls from "../../_components/select-hall-form"
 
 const page = async ({
   searchParams,
@@ -35,7 +36,7 @@ const page = async ({
             <PlusIcon className="border-1 h-full w-full rounded-full bg-slate-100 p-1" />
           }
         >
-          <HallForm />
+          <Selecthalls onClose={() => {}} examId={params.id} />
         </DialogModal>
       </div>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
