@@ -1,9 +1,8 @@
-import { editSchema } from "@/schemas/generate-hall/edit-schema"
-import { select } from "@nextui-org/react"
-import { ExamType } from "@prisma/client"
+import { ExamType, HallArrangementType } from "@prisma/client"
 import { z } from "zod"
 
 import { ExamDetails, ExamDetailsWithDate } from "@/types/exam"
+import { HallWithSeatsAndDept } from "@/types/hall"
 import { db } from "@/lib/db"
 
 import { planRouter } from "./plan"
@@ -35,6 +34,102 @@ export const examRouter = router({
         },
       })
       return res
+    }),
+  updateHalls: publicProcedure
+    .input(
+      z.object({
+        examId: z.string(),
+        hallIds: z.array(z.string()),
+        type: z.nativeEnum(HallArrangementType),
+      })
+    )
+    .mutation(async ({ input }): Promise<HallWithSeatsAndDept[]> => {
+      // TODO: optimize this to be single query
+      let exam = await db.exam.findUnique({
+        where: {
+          id: input.examId,
+        },
+        include: {
+          halls: {
+            include: {
+              department: true,
+              seats: true,
+            },
+          },
+        },
+      })
+      if (!exam) {
+        throw new Error("Exam not found")
+      }
+      let existingHallIds = exam.halls.map((hall) => hall.id)
+      let hallsToBeDeleted = existingHallIds.filter(
+        (hallId) => !input.hallIds.includes(hallId)
+      )
+      let hallsToBeAdded = input.hallIds.filter(
+        (hallId) => !existingHallIds.includes(hallId)
+      )
+      console.log(hallsToBeDeleted)
+      console.log(hallsToBeAdded)
+      let halls = await db.hall.findMany({
+        where: {
+          id: {
+            in: hallsToBeAdded,
+          },
+        },
+        include: {
+          department: true,
+          seats: true,
+        },
+      })
+      const newHalls = await db.$transaction(async (tx) => {
+        const newHallsThatAreCopyOfItsParentPromise = Promise.all(
+          halls.map(({ type, id, department, seats, ...hall }) => {
+            return tx.hall.create({
+              data: {
+                ...hall,
+                rootHallId: id,
+                departmentId: hall.departmentId,
+                examId: input.examId,
+                type: input.type,
+                seats: {
+                  createMany: {
+                    data: seats.map(
+                      ({ id, hallId, studentId, year, semester, ...seat }) => ({
+                        ...seat,
+                      })
+                    ),
+                  },
+                },
+              },
+              include: {
+                department: true,
+                seats: true,
+              },
+            })
+          })
+        )
+        const oldHallsThatAreDeletedPromise = Promise.all(
+          hallsToBeDeleted.map((hallId) => {
+            return tx.hall.delete({
+              where: {
+                id: hallId,
+              },
+            })
+          })
+        )
+        const [newHallsThatAreCopyOfItsParent] = await Promise.all([
+          newHallsThatAreCopyOfItsParentPromise,
+          oldHallsThatAreDeletedPromise,
+        ])
+        return newHallsThatAreCopyOfItsParent
+      })
+      const currentHallsForExam = [
+        ...exam.halls
+          .filter((hall) => !hallsToBeDeleted.includes(hall.id))
+          .map((hall) => hall),
+        ...newHalls,
+      ]
+      return currentHallsForExam
     }),
 
   editExam: publicProcedure.input(z.string()).query(async ({ input: id }) => {

@@ -1,13 +1,10 @@
 "use server"
-
 import { redirect } from "next/navigation"
 import { GenerateHallSchema } from "@/schemas/generate-hall/input-schema"
 import { HallArrangementType, Prisma } from "@prisma/client"
 import { DefaultArgs } from "@prisma/client/runtime/library"
 import { z } from "zod"
-
 import { db } from "@/lib/db"
-
 export const checkSameHallNoExists = async (
   hallno: number,
   departmentId: string
@@ -22,11 +19,9 @@ export const checkSameHallNoExists = async (
 }
 export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
   const validatedFields = GenerateHallSchema.safeParse(input)
-
   if (!validatedFields.success) {
     return { error: "Invalid fields!" }
   }
-
   const {
     examDetails,
     timingDetails,
@@ -94,7 +89,6 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
           },
         },
       })
-
       // Handle halls creation here...
       console.log(halls)
       if (halls.length === 0) {
@@ -122,7 +116,6 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
           })
         })
       )
-
       const examDatesPromise = Promise.all(
         durationDetails.map((detail) => {
           const data: Prisma.DateCreateArgs<DefaultArgs> = {
@@ -160,7 +153,6 @@ export const createExam = async (input: z.infer<typeof GenerateHallSchema>) => {
     console.error("Error creating exam:", error.message)
   }
 }
-
 export const updateExam = async (
   id: string,
   input: z.infer<typeof GenerateHallSchema>
@@ -173,6 +165,5 @@ export const updateExam = async (
     ...hallDetails
   } = input
   const selectedYears = Array.from(timingDetails.selectedYears).map(Number)
-
   // Do it as efficiently as possible for
 }
