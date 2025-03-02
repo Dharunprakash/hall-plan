@@ -127,11 +127,10 @@ export const planRouter = router({
       )
       console.log(HALL_TYPE)
       console.log(segregatedSeats)
-      const plan = new GeneratePlan(
-        studentsCountArr,
+      const plan = new GeneratePlan(studentsCountArr, [
         segregatedSeats.group1Cnt,
-        segregatedSeats.group2Cnt
-      )
+        segregatedSeats.group2Cnt,
+      ])
       const combinations = plan.generateCombinations()
       if (!combinations) {
         console.log("Not enough seats")
