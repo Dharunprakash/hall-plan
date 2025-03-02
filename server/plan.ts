@@ -157,22 +157,33 @@ export const planRouter = router({
         }))
       )
       console.log(groupHallBySeatCombination)
-      const promises1 = fillHalls({
-        groupedStudents: groupStudentBySeatCombination[1],
-        groupedHalls: groupHallBySeatCombination[1],
-        hallType: HALL_TYPE,
-      })
-      console.log("Success")
-      if (HALL_TYPE !== "NORMAL") {
-        const promises2 = fillHalls({
-          groupedStudents: groupStudentBySeatCombination[2],
-          groupedHalls: groupHallBySeatCombination[2],
-          hallType: HALL_TYPE,
-        })
-        await Promise.all([...promises1, ...promises2])
-      } else {
-        await Promise.all(promises1)
-      }
+
+      await db.$transaction(
+        async (tx) => {
+          const promises1 = fillHalls({
+            groupedStudents: groupStudentBySeatCombination[1],
+            groupedHalls: groupHallBySeatCombination[1],
+            hallType: HALL_TYPE,
+            tx: tx as typeof db,
+          })
+          console.log("Success")
+          if (HALL_TYPE !== "NORMAL") {
+            const promises2 = fillHalls({
+              groupedStudents: groupStudentBySeatCombination[2],
+              groupedHalls: groupHallBySeatCombination[2],
+              hallType: HALL_TYPE,
+              tx: tx as typeof db,
+            })
+            await Promise.all([...promises1, ...promises2])
+          } else {
+            await Promise.all(promises1)
+          }
+        },
+        {
+          maxWait: 5000, // default: 2000
+          timeout: 60000, // default: 5000
+        }
+      )
     }),
 })
 
@@ -180,10 +191,12 @@ export const fillHalls = ({
   groupedStudents, //groupStudentBySeatCombination[1]
   groupedHalls, // groupHallBySeatCombination[1]
   hallType,
+  tx = db,
 }: {
   groupedStudents: [{ dept: string; year: number }, StudentWithDept[]][]
   groupedHalls: HallWithSeatsWithStudentsAndDept[]
   hallType: $Enums.HallArrangementType
+  tx: typeof db
 }) => {
   const promises = []
   let hallPtr = 0
@@ -215,7 +228,7 @@ export const fillHalls = ({
         }
         if (seatPtr < hallSize) {
           promises.push(
-            db.seat.update({
+            tx.seat.update({
               where: {
                 id: groupedHalls[hallPtr].seats[seatPtr].id,
               },
