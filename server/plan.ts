@@ -128,9 +128,9 @@ export const planRouter = router({
       console.log(HALL_TYPE)
       console.log(segregatedSeats)
       const plan = new GeneratePlan(
-        studentsCountArr,
+        studentsCountArr,[
         segregatedSeats.group1Cnt,
-        segregatedSeats.group2Cnt
+        segregatedSeats.group2Cnt]
       )
       const combinations = plan.generateCombinations()
       if (!combinations) {
