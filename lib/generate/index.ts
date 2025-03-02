@@ -1,16 +1,12 @@
 export class GeneratePlan {
-  private dp: number[][][]
+  private dp: Map<string, boolean>
   private students: number[]
   private seats: number[]
 
   constructor(students: number[], seats: number[]) {
     this.students = students
     this.seats = seats
-    this.dp = Array.from({ length: students.length + 1 }, () =>
-      Array.from({ length: seats[0] + 1 }, () =>
-        Array.from({ length: seats[1] + 1 }, () => -1)
-      )
-    )
+    this.dp = new Map()
   }
 
   isPossibleToMakeThemSit(): boolean {
@@ -24,19 +20,19 @@ export class GeneratePlan {
     if (i === this.students.length) {
       return true
     }
-    const key = remainingSeats.join(',')
-    if (this.dp[i][remainingSeats[0]][remainingSeats[1]] !== -1) {
-      return this.dp[i][remainingSeats[0]][remainingSeats[1]] === 1
+    const key = `${i},${remainingSeats.join(',')}`
+    if (this.dp.has(key)) {
+      return this.dp.get(key)!
     }
     for (let j = 0; j < remainingSeats.length; j++) {
       const newRemainingSeats = [...remainingSeats]
       newRemainingSeats[j] -= this.students[i]
       if (this.f(i + 1, newRemainingSeats)) {
-        this.dp[i][remainingSeats[0]][remainingSeats[1]] = 1
+        this.dp.set(key, true)
         return true
       }
     }
-    this.dp[i][remainingSeats[0]][remainingSeats[1]] = 0
+    this.dp.set(key, false)
     return false
   }
 
