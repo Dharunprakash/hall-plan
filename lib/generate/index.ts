@@ -1,86 +1,60 @@
 export class GeneratePlan {
-  private dp: number[][][]
+  private dp: Map<string, boolean>
   private students: number[]
-  private type1Seats: number
-  private type2Seats: number
+  private seats: number[]
 
-  constructor(students: number[], type1Seats: number, type2Seats: number) {
+  constructor(students: number[], seats: number[]) {
     this.students = students
-    this.type1Seats = type1Seats
-    this.type2Seats = type2Seats
-    this.dp = Array.from({ length: students.length + 1 }, () =>
-      Array.from({ length: type1Seats + 1 }, () =>
-        Array.from({ length: type2Seats + 1 }, () => -1)
-      )
-    )
+    this.seats = seats
+    this.dp = new Map()
   }
 
   isPossibleToMakeThemSit(): boolean {
-    return this.f(0, this.type1Seats, this.type2Seats)
+    return this.f(0, this.seats)
   }
 
-  private f(i: number, tar1: number, tar2: number): boolean {
-    if (tar1 < 0 || tar2 < 0) {
+  private f(i: number, remainingSeats: number[]): boolean {
+    if (remainingSeats.some(seat => seat < 0)) {
       return false
     }
     if (i === this.students.length) {
       return true
     }
-    if (this.dp[i][tar1][tar2] !== -1) {
-      return this.dp[i][tar1][tar2] === 1
+    const key = `${i},${remainingSeats.join(',')}`
+    if (this.dp.has(key)) {
+      return this.dp.get(key)!
     }
-    let type1 = this.f(i + 1, tar1 - this.students[i], tar2)
-    let type2 = this.f(i + 1, tar1, tar2 - this.students[i])
-    this.dp[i][tar1][tar2] = type1 || type2 ? 1 : 0
-    return this.dp[i][tar1][tar2] === 1
+    for (let j = 0; j < remainingSeats.length; j++) {
+      const newRemainingSeats = [...remainingSeats]
+      newRemainingSeats[j] -= this.students[i]
+      if (this.f(i + 1, newRemainingSeats)) {
+        this.dp.set(key, true)
+        return true
+      }
+    }
+    this.dp.set(key, false)
+    return false
   }
+
   generateCombinations(): number[] | undefined {
-    this.f(0, this.type1Seats, this.type2Seats)
-    let fi = [0],
-      se = [0],
-      ans: number[] = []
-    const generate = (i: number, tar1: number, tar2: number): void => {
+    this.f(0, this.seats)
+    const ans: number[] = []
+    const generate = (i: number, remainingSeats: number[]): void => {
       if (i === this.students.length) {
         return
       }
-      if (
-        tar1 - this.students[i] >= 0 &&
-        this.dp[i + 1][tar1 - this.students[i]][tar2] &&
-        tar2 - this.students[i] >= 0 &&
-        this.dp[i + 1][tar1][tar2 - this.students[i]]
-      ) {
-        if (fi[0] < se[0]) {
-          fi[0]++
-          ans.push(1)
-          generate(i + 1, tar1 - this.students[i], tar2)
-        } else {
-          se[0]++
-          ans.push(2)
-          generate(i + 1, tar1, tar2 - this.students[i])
+      for (let j = 0; j < remainingSeats.length; j++) {
+        const newRemainingSeats = [...remainingSeats]
+        newRemainingSeats[j] -= this.students[i]
+        if (newRemainingSeats[j] >= 0 && this.f(i + 1, newRemainingSeats)) {
+          ans.push(j + 1)
+          generate(i + 1, newRemainingSeats)
+          return
         }
-        return
-      }
-      if (
-        tar1 - this.students[i] >= 0 &&
-        this.dp[i + 1][tar1 - this.students[i]][tar2]
-      ) {
-        fi[0]++
-        ans.push(1)
-        generate(i + 1, tar1 - this.students[i], tar2)
-        return
-      }
-      if (
-        tar2 - this.students[i] >= 0 &&
-        this.dp[i + 1][tar1][tar2 - this.students[i]]
-      ) {
-        se[0]++
-        ans.push(2)
-        generate(i + 1, tar1, tar2 - this.students[i])
-        return
       }
     }
-    if (this.dp[0][this.type1Seats][this.type2Seats]) {
-      generate(0, this.type1Seats, this.type2Seats)
+    if (this.f(0, this.seats)) {
+      generate(0, this.seats)
       return ans
     } else {
       return undefined
