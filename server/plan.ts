@@ -5,10 +5,11 @@ import { HallWithSeatsWithStudentsAndDept } from "@/types/hall"
 import { StudentWithDept } from "@/types/student"
 import { db } from "@/lib/db"
 import { GeneratePlan } from "@/lib/generate"
-import { separateSeatsInto2groupsForHalls } from "@/lib/hall/seats"
+
 import { groupStudentsByDeptYear } from "@/lib/hall/student"
 
 import { publicProcedure, router } from "./trpc"
+import { separateSeatsIntoKGroupsForHalls } from "@/lib/hall/seats"
 
 export const planRouter = router({
   generate: publicProcedure
@@ -120,18 +121,21 @@ export const planRouter = router({
       console.log(studentsCount)
       console.log(seatsCount)
       const HALL_TYPE = exam.halls[0].type || "NORMAL"
-      const segregatedSeats = separateSeatsInto2groupsForHalls(
+      const segregatedSeats = separateSeatsIntoKGroupsForHalls(
         halls,
         HALL_TYPE,
-        "Minimal"
+        "Maximal",
+        2
       )
       console.log(HALL_TYPE)
       console.log(segregatedSeats)
       const plan = new GeneratePlan(
         studentsCountArr,
-        segregatedSeats.group1Cnt,
-        segregatedSeats.group2Cnt
+        segregatedSeats.groupCounts[0],
+        segregatedSeats.groupCounts[1]
       )
+
+     
       const combinations = plan.generateCombinations()
       if (!combinations) {
         console.log("Not enough seats")
@@ -142,13 +146,10 @@ export const planRouter = router({
         2: groupedStudents.filter((_, ind) => combinations[ind] === 2),
       }
       const groupHallBySeatCombination = {
-        1: halls.filter(
-          (_, ind) => segregatedSeats.seatsTypeForHalls[ind] === 1
-        ),
-        2: halls.filter(
-          (_, ind) => segregatedSeats.seatsTypeForHalls[ind] === 2
-        ),
+        1: halls.filter((_, ind) => combinations[ind] === 1),
+        2: halls.filter((_, ind) => combinations[ind] === 2),
       }
+      
       console.log(
         groupStudentBySeatCombination[1].map(([key, s]) => ({
           year: key.year,
