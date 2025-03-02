@@ -189,6 +189,7 @@ export const fillHalls = ({
   let hallPtr = 0
 
   try {
+    let tempArr = []
     for (let i = 0; i < groupedStudents.length; i++) {
       // return plan.generateAlternatePlan(combinations, groupedStudents, groupedHalls)
       let stdSize = groupedStudents[i][1].length
@@ -214,17 +215,18 @@ export const fillHalls = ({
             seatPtr++
         }
         if (seatPtr < hallSize) {
+          tempArr.push({
+            studentId: groupedStudents[i][1][stdPtr].id,
+            year: groupedStudents[i][1][stdPtr].year,
+            semester: groupedStudents[i][1][stdPtr].semester,
+          })
           promises.push(
             db.seat.update({
               where: {
                 id: groupedHalls[hallPtr].seats[seatPtr].id,
               },
               data: {
-                student: {
-                  connect: {
-                    id: groupedStudents[i][1][stdPtr].id,
-                  },
-                },
+                studentId: groupedStudents[i][1][stdPtr].id,
                 year: groupedStudents[i][1][stdPtr].year,
                 semester: groupedStudents[i][1][stdPtr].semester,
               },
@@ -239,6 +241,8 @@ export const fillHalls = ({
         }
       }
     }
+    console.log(tempArr)
+    console.log("Success")
   } catch (error: any) {
     console.log(error)
     throw new Error(error.message)
