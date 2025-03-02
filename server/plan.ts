@@ -6,8 +6,20 @@ import { StudentWithDept } from "@/types/student"
 import { db } from "@/lib/db"
 import { GeneratePlan } from "@/lib/generate"
 import { separateSeatsInto2groupsForHalls } from "@/lib/hall/seats"
-import { groupStudentsByDeptYear } from "@/lib/hall/student"
+import {
+  CriteriaFactory,
+  CriteriaTypes,
+  GroupingCriteriaConditionalProcessor,
+  GroupingCriteriaNode,
+  GroupingCriteriaType,
+  OrderCriteriaNode,
+  OrderCriteriaType,
+} from "@/lib/utils/criteria"
 
+import {
+  CriteriaBuilder,
+  OrderCriteriaProcessor,
+} from "./../lib/utils/criteria"
 import { publicProcedure, router } from "./trpc"
 
 export const planRouter = router({
@@ -105,17 +117,30 @@ export const planRouter = router({
         console.log("Not enough seats")
         throw new Error("Not enough seats")
       }
-      const groupedStudents = groupStudentsByDeptYear(students)
-      console.log(
-        groupedStudents.map(([key, s]) => ({
-          year: key.year,
-          dept: key.dept,
-          std: s.map((d) => ({ sec: d.section, rno: d.rollno })),
-        }))
+      const orderBuilder = CriteriaBuilder.createBuilder(
+        CriteriaFactory.createCriteria(CriteriaTypes.ORDER)
       )
-      const studentsCountArr = groupedStudents.map(
-        ([key, student]) => student.length
+      const orderNode = new OrderCriteriaNode(OrderCriteriaType.DEPARTMENT, 1)
+      const order = orderBuilder
+        .initialCriteria(orderNode)
+        .and(new OrderCriteriaNode(OrderCriteriaType.YEAR, 1))
+        .and(new OrderCriteriaNode(OrderCriteriaType.SECTION, 1))
+        .and(new OrderCriteriaNode(OrderCriteriaType.ROLLNO, 1))
+        .build()
+      const orderedStudents = new OrderCriteriaProcessor(order).order(students)
+      const groupBuilder = CriteriaBuilder.createBuilder(
+        CriteriaFactory.createCriteria(CriteriaTypes.GROUPING)
       )
+      const group = groupBuilder
+        .initialCriteria(
+          new GroupingCriteriaNode(GroupingCriteriaType.DEPARTMENT, 1)
+        )
+        .and(new GroupingCriteriaNode(GroupingCriteriaType.YEAR, 1))
+        .build()
+      const groupedStudents = new GroupingCriteriaConditionalProcessor(
+        group
+      ).group(orderedStudents)
+      const studentsCountArr = groupedStudents.map((obj) => obj.students.length)
       console.log(studentsCountArr)
       console.log(studentsCount)
       console.log(seatsCount)
@@ -150,22 +175,28 @@ export const planRouter = router({
         ),
       }
       console.log(
-        groupStudentBySeatCombination[1].map(([key, s]) => ({
-          year: key.year,
-          dept: key.dept,
-          std: s.map((d) => ({ sec: d.section, rno: d.rollno })),
+        groupStudentBySeatCombination[1].map((obj) => ({
+          year: obj.key.year,
+          dept: obj.key.department?.code,
+          std: obj.students.map((d) => ({ sec: d.section, rno: d.rollno })),
         }))
       )
       console.log(groupHallBySeatCombination)
       const promises1 = fillHalls({
-        groupedStudents: groupStudentBySeatCombination[1],
+        groupedStudents: groupStudentBySeatCombination[1].map((obj) => [
+          { dept: obj.key.department?.code ?? "", year: obj.key.year ?? 0 },
+          obj.students,
+        ]),
         groupedHalls: groupHallBySeatCombination[1],
         hallType: HALL_TYPE,
       })
       console.log("Success")
       if (HALL_TYPE !== "NORMAL") {
         const promises2 = fillHalls({
-          groupedStudents: groupStudentBySeatCombination[2],
+          groupedStudents: groupStudentBySeatCombination[2].map((obj) => [
+            { dept: obj.key.department?.code ?? "", year: obj.key.year ?? 0 },
+            obj.students,
+          ]),
           groupedHalls: groupHallBySeatCombination[2],
           hallType: HALL_TYPE,
         })
